@@ -21,13 +21,13 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
     @EntityGraph(attributePaths = {"profiles", "addresses"})
     Optional<UserJpaEntity> findByEmail(@Param("email") String email);
 
-    boolean existsByEmailOrLogin(String email, String login);
+//    boolean existsByEmailOrLogin(String email, String login);
 
     @EntityGraph(attributePaths = {"profiles", "addresses"})
     Optional<UserJpaEntity> findById(@Param("id") UUID id);
 
-    @EntityGraph(attributePaths = {"profiles", "addresses"})
-    Optional<UserJpaEntity> findByLogin(@Param("login") String login);
+//    @EntityGraph(attributePaths = {"profiles", "addresses"})
+//    Optional<UserJpaEntity> findByLogin(@Param("login") String login);
 
     @EntityGraph(attributePaths = {"profiles", "addresses"})
     Page<UserJpaEntity> findAll(Pageable pageable);

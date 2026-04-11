@@ -32,22 +32,22 @@ public class UserRepositoryImpl implements UserRepository {
         return mapper.toDomain(saved);
     }
 
-    @Override
-    public boolean existsByEmailOrLogin(String email, String login) {
-        return userJpaRepository.existsByEmailOrLogin(email, login);
-    }
+//    @Override
+//    public boolean existsByEmailOrLogin(String email, String login) {
+//        return userJpaRepository.existsByEmailOrLogin(email, login);
+//    }
+//
+//    @Override
+//    public Optional<User> findByLogin(String login) {
+//        return userJpaRepository.findByLogin(login)
+//                .map(mapper::toDomain);
+//    }
 
-    @Override
-    public Optional<User> findByLogin(String login) {
-        return userJpaRepository.findByLogin(login)
-                .map(mapper::toDomain);
-    }
-
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return userJpaRepository.findByEmail(email)
-                .map(mapper::toDomain);
-    }
+//    @Override
+//    public Optional<User> findByEmail(String email) {
+//        return userJpaRepository.findByEmail(email)
+//                .map(mapper::toDomain);
+//    }
 
     @Override
     public Optional<User> findById(UUID id) {

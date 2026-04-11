@@ -8,7 +8,6 @@ public record UserQueryPort(
         String id,
         String name,
         String email,
-        String login,
         boolean active,
         Set<ProfileType> profileType,
         Set<AddressQueryPort> addresses
