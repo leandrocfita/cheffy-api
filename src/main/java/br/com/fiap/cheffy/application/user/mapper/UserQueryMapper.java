@@ -22,7 +22,6 @@ public class UserQueryMapper {
                 user.getId().toString(),
                 user.getName(),
                 user.getEmail(),
-                user.getLogin(),
                 user.isActive(),
                 toProfileTypes(user),
                 toAddressQueries(user)

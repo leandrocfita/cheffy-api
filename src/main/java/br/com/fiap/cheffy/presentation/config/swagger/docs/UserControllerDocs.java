@@ -2,6 +2,7 @@ package br.com.fiap.cheffy.presentation.config.swagger.docs;
 
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.application.user.dto.UserQueryPort;
+import br.com.fiap.cheffy.infrastructure.security.resolver.CurrentUserMapper;
 import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultApiErrors;
 import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultBadRequestApiResponse;
 import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultConflictApiResponse;
@@ -26,6 +27,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
@@ -75,12 +78,12 @@ public interface UserControllerDocs {
     )
     ResponseEntity<String> createUser(@Valid UserCreateDTO userCreateDTO);
 
-    @Operation(summary = "Atualizar senha do usuário")
-    @ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso")
-    @DefaultBadRequestApiResponse
-    @DefaultApiErrors
-    @DefaultNotFoundApiResponse
-    ResponseEntity<UUID> updateUserPassword(UUID id, @Valid UserUpdatePasswordDTO userUpdatePasswordDTO);
+//    @Operation(summary = "Atualizar senha do usuário")
+//    @ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso")
+//    @DefaultBadRequestApiResponse
+//    @DefaultApiErrors
+//    @DefaultNotFoundApiResponse
+//    ResponseEntity<UUID> updateUserPassword(UUID id, @Valid UserUpdatePasswordDTO userUpdatePasswordDTO);
 
     @Operation(summary = "Atualizar usuário", description = "Atualização parcial - apenas campos enviados são modificados")
     @ApiResponse(responseCode = "204", description = "Usuário atualizado com sucesso")
@@ -157,7 +160,8 @@ public interface UserControllerDocs {
     )
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
-    ResponseEntity<UserQueryPort> findUserById(UUID id);
+    ResponseEntity<UserQueryPort> findUserById(UUID id, @AuthenticationPrincipal Jwt jwt,
+                                               CurrentUserMapper currentUserMapper);
 
     @Hidden
     @ApiResponse(

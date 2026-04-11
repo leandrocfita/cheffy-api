@@ -33,10 +33,7 @@ public class UserJpaEntity {
     private String email;
 
     @Column(nullable = false, unique = true)
-    private String login;
-
-    @Column(nullable = false)
-    private String password;
+    private  String authId;
 
     @ManyToMany
     @JoinTable(
