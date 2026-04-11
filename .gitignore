@@ -1,0 +1,82 @@
+############################
+# Java
+############################
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# Arquivos temporarios
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Diretorios de build
+target/
+build/
+out/
+
+############################
+# Maven
+############################
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+mvnw
+mvnw.cmd
+
+############################
+# Gradle
+############################
+.gradle/
+**/build/
+gradle-app.setting
+
+############################
+# IntelliJ
+############################
+.idea/
+*.iml
+*.iws
+
+############################
+# VS Code
+############################
+.vscode/
+
+############################
+# Sistema operacional
+############################
+.DS_Store
+Thumbs.db
+
+
+############################
+# NetBeans
+############################
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+############################
+# STS
+############################
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+####### SECRETS ##############
+*.env
