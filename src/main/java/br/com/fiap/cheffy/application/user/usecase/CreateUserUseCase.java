@@ -5,9 +5,9 @@ import br.com.fiap.cheffy.application.user.dto.UserCommandPort;
 import br.com.fiap.cheffy.domain.profile.ProfileType;
 import br.com.fiap.cheffy.domain.profile.entity.Profile;
 import br.com.fiap.cheffy.domain.profile.exception.ProfileNotFoundException;
-import br.com.fiap.cheffy.domain.user.port.input.PasswordEncoderPort;
 import br.com.fiap.cheffy.domain.profile.port.output.ProfileRepository;
 import br.com.fiap.cheffy.domain.user.entity.Address;
+import br.com.fiap.cheffy.domain.user.entity.AuthStatus;
 import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.port.input.CreateUserInput;
 import br.com.fiap.cheffy.domain.user.port.output.AuthUserExternalClient;
@@ -35,23 +35,63 @@ public class CreateUserUseCase implements CreateUserInput {
 
     public String execute(UserCommandPort command){
 
-        String authId = createAuthUserOrFail(command);
+        User user = userRepository.findByEmail(command.email())
+                .map(existingUser -> {
 
-        User user = createUserDomain(command, authId);
+                    failCaseUserAlreadyExists(existingUser);
+
+                    return updatePendingUser(command, existingUser);
+
+                }).orElseGet(()-> createNewUser(command));
 
 
-        Address address = createAddressDomain(command);
-
-        user.addAddress(address);
-
-        return userRepository.save(user).getId().toString();
+        return processAuthIntegration(command, user);
 
     }
 
-    private String createAuthUserOrFail(UserCommandPort command) {
+    private User createNewUser(UserCommandPort command) {
+        User newUser = createUserDomain(command);
+        Address address = createAddressDomain(command);
+        newUser.addAddress(address);
+
+        return userRepository.save(newUser);
+    }
+
+    private User updatePendingUser(UserCommandPort command, User existingUser) {
+        existingUser.updatePendingUserInformation(command.name(), createAddressDomain(command));
+        return userRepository.save(existingUser);
+    }
+
+    private static void failCaseUserAlreadyExists(User existingUser) {
+        if(existingUser.getAuthStatus() == AuthStatus.CONFIRMED){
+            throw new RegisterFailedException(REGISTER_FAILED_EXCEPTION);
+        }
+    }
+
+    private String processAuthIntegration(UserCommandPort command, User user)  {
+        String userIdString = user.getId().toString();
+
+        try {
+            String authId = createAuthUserOrFail(command, userIdString);
+            user.finishAuthIntegration(authId);
+            userRepository.save(user);
+        } catch (Exception e){
+            throw e;
+        }
+        return userIdString;
+    }
+
+
+    private String createAuthUserOrFail(UserCommandPort command, String userId) {
         String authId = null;
         try {
-            authId = authClient.createUser(new AuthUserCommandPort(command.login(), command.password()));
+            authId = authClient.createUser(
+                    new AuthUserCommandPort(
+                        command.login(),
+                        command.password(),
+                        userId
+                    )
+            );
         } catch (LoginAlreadyExistsException e) {
             throw new RegisterFailedException(REGISTER_FAILED_EXCEPTION);
         }
@@ -76,12 +116,11 @@ public class CreateUserUseCase implements CreateUserInput {
                 );
     }
 
-    private User createUserDomain(UserCommandPort command, String authId) {
+    private User createUserDomain(UserCommandPort command) {
         return User.create(
                 command.name(),
                 command.email(),
-                findClientProfile(),
-                authId
+                findClientProfile()
         );
     }
 

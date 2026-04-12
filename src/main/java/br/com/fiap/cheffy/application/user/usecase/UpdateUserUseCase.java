@@ -28,8 +28,7 @@ public class UpdateUserUseCase implements UpdateUserInput {
 
         user.patch(
                 command.name(),
-                command.email(),
-                command.login()
+                command.email()
         );
 
         userRepository.save(user);
