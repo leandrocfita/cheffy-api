@@ -19,6 +19,7 @@ public class User {
     private String email;
 
     private String authId;
+    private AuthStatus authStatus;
     private boolean active;
 
     private Set<Profile> profiles = new HashSet<>();
@@ -26,27 +27,34 @@ public class User {
 
     protected User() {}
 
-    public User(UUID id, String name, String email, String authId, boolean active) {
+    public User(UUID id, String name, String email, String authId, boolean active, AuthStatus authStatus) {
         this.id = id;
         this.name = Objects.requireNonNull(name);
         this.email = Objects.requireNonNull(email);
         this.active = active;
         this.authId = authId;
+        this.authStatus = authStatus;
+    }
+
+    public void updatePendingUserInformation(String name, Address newAddress){
+        this.name = name;
+        this.addresses.clear();
+        this.addAddress(newAddress);
     }
 
     /*Factory Method*/
     public static User create(
             String name,
             String email,
-            Profile profile,
-            String authId
+            Profile profile
     ) {
         User user = new User(
                 null,
                 name,
                 email,
-                authId,
-                true
+                null,
+                true,
+                AuthStatus.PENDING
         );
 
         user.addProfile(profile);
@@ -55,8 +63,7 @@ public class User {
 
     public void patch(
             String name,
-            String email,
-            String login
+            String email
     ) {
         if (name != null && !name.isEmpty()) this.name = name;
         if (email != null && !email.isEmpty()) this.email = email;
@@ -119,6 +126,15 @@ public class User {
                         ADDRESS_NOT_FOUND_EXCEPTION,
                         addressId
                 ));
+    }
+
+    public void finishAuthIntegration(String authId){
+        this.authId = authId;
+        this.authStatus = AuthStatus.CONFIRMED;
+    }
+
+    public void integrationFailed(){
+        this.authStatus = AuthStatus.FAILED;
     }
 
     public void addAddress(Address address) {
@@ -184,6 +200,10 @@ public class User {
 
 
     //Getters
+    public AuthStatus getAuthStatus() {
+        return authStatus;
+    }
+
     public String getAuthId() {
         return authId;
     }

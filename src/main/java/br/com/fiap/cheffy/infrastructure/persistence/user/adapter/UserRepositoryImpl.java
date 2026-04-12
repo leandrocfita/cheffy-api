@@ -8,6 +8,7 @@ import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
 import br.com.fiap.cheffy.infrastructure.persistence.user.entity.UserJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.mapper.UserPersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.user.repository.UserJpaRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,22 +33,12 @@ public class UserRepositoryImpl implements UserRepository {
         return mapper.toDomain(saved);
     }
 
-//    @Override
-//    public boolean existsByEmailOrLogin(String email, String login) {
-//        return userJpaRepository.existsByEmailOrLogin(email, login);
-//    }
-//
-//    @Override
-//    public Optional<User> findByLogin(String login) {
-//        return userJpaRepository.findByLogin(login)
-//                .map(mapper::toDomain);
-//    }
 
-//    @Override
-//    public Optional<User> findByEmail(String email) {
-//        return userJpaRepository.findByEmail(email)
-//                .map(mapper::toDomain);
-//    }
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userJpaRepository.findByEmail(email)
+                .map(mapper::toDomain);
+    }
 
     @Override
     public Optional<User> findById(UUID id) {
