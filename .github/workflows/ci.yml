@@ -67,7 +67,7 @@ jobs:
 #            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
   docker-deploy:
-    needs: tests
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
