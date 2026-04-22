@@ -2,6 +2,7 @@ package br.com.fiap.cheffy.infrastructure.bean_config;
 
 import br.com.fiap.cheffy.application.address.mapper.AddressQueryMapper;
 import br.com.fiap.cheffy.application.fooditem.mapper.FoodItemQueryMapper;
+import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.profile.mapper.ProfileQueryMapper;
 import br.com.fiap.cheffy.application.restaurant.mapper.ResturantQueryMapper;
 import br.com.fiap.cheffy.application.user.mapper.UserQueryMapper;
@@ -20,12 +21,14 @@ class ApplicationMapperConfigTest {
         AddressQueryMapper addressQueryMapper = config.addressQueryMapper();
         ResturantQueryMapper resturantQueryMapper = config.resturantQueryMapper(addressQueryMapper, foodItemQueryMapper);
         UserQueryMapper userQueryMapper = config.userQueryMapper(addressQueryMapper);
+        OrderQueryMapper orderQueryMapper = config.orderQueryMapper();
 
         assertThat(profileQueryMapper).isNotNull();
         assertThat(foodItemQueryMapper).isNotNull();
         assertThat(resturantQueryMapper).isNotNull();
         assertThat(userQueryMapper).isNotNull();
         assertThat(addressQueryMapper).isNotNull();
+        assertThat(orderQueryMapper).isNotNull();
 
     }
 }

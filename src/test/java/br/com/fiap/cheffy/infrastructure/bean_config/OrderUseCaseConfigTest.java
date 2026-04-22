@@ -1,7 +1,10 @@
 package br.com.fiap.cheffy.infrastructure.bean_config;
 
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
+import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.order.usecase.CreateOrderUseCase;
+import br.com.fiap.cheffy.application.order.usecase.FindOrderByIdUseCase;
+import br.com.fiap.cheffy.application.order.usecase.ListOrdersByCustomerUseCase;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import org.junit.jupiter.api.Test;
@@ -14,11 +17,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderUseCaseConfigTest {
 
+    private final OrderQueryMapper orderQueryMapper = new OrderQueryMapper();
+
     @Test
     void createOrderUseCaseCreatesBean() {
         OrderUseCaseConfig config = new OrderUseCaseConfig();
 
         CreateOrderUseCase useCase = config.createOrderUseCase(new StubOrderRepository(), new StubFoodItemServiceHelper());
+
+        assertThat(useCase).isNotNull();
+    }
+
+    @Test
+    void findOrderByIdUseCaseCreatesBean() {
+        OrderUseCaseConfig config = new OrderUseCaseConfig();
+
+        FindOrderByIdUseCase useCase = config.findOrderByIdUseCase(new StubOrderRepository(), orderQueryMapper);
+
+        assertThat(useCase).isNotNull();
+    }
+
+    @Test
+    void listOrdersByCustomerUseCaseCreatesBean() {
+        OrderUseCaseConfig config = new OrderUseCaseConfig();
+
+        ListOrdersByCustomerUseCase useCase = config.listOrdersByCustomerUseCase(new StubOrderRepository(), orderQueryMapper);
 
         assertThat(useCase).isNotNull();
     }
