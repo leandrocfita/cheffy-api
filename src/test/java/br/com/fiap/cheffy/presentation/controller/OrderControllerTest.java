@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.presentation.controller;
 
+import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
 import br.com.fiap.cheffy.domain.order.port.input.CreateOrderInput;
 import br.com.fiap.cheffy.presentation.dto.OrderCreateDTO;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderControllerTest {
 
     @Test
-    void createOrderReturnsCreatedWithOrderId() {
+    void createOrderReturnsCreatedWithOrderIdAndTotalAmount() {
         InMemoryCreateOrderInput createOrderInput = new InMemoryCreateOrderInput();
         OrderController controller = new OrderController(createOrderInput, new OrderWebMapper());
 
@@ -31,10 +32,12 @@ class OrderControllerTest {
                 List.of(new OrderItemDTO(foodItemId, "Burger", 2, new BigDecimal("15.00")))
         );
 
-        ResponseEntity<String> response = controller.createOrder(dto, userId);
+        ResponseEntity<CreateOrderResultPort> response = controller.createOrder(dto, userId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isEqualTo(createOrderInput.createdId);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().orderId()).isEqualTo(createOrderInput.createdId);
+        assertThat(response.getBody().totalAmount()).isEqualByComparingTo("30.00");
         assertThat(createOrderInput.customerId).isEqualTo(userId);
         assertThat(createOrderInput.command.restaurantId()).isEqualTo(restaurantId);
         assertThat(createOrderInput.command.items()).hasSize(1);
@@ -43,15 +46,15 @@ class OrderControllerTest {
 
     private static class InMemoryCreateOrderInput implements CreateOrderInput {
 
-        private final String createdId = UUID.randomUUID().toString();
+        private final UUID createdId = UUID.randomUUID();
         private OrderCommandPort command;
         private UUID customerId;
 
         @Override
-        public String execute(OrderCommandPort command, UUID customerId) {
+        public CreateOrderResultPort execute(OrderCommandPort command, UUID customerId) {
             this.command = command;
             this.customerId = customerId;
-            return createdId;
+            return new CreateOrderResultPort(createdId, new BigDecimal("30.00"));
         }
     }
 }
