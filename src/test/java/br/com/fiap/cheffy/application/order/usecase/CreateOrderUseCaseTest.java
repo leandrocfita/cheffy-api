@@ -1,14 +1,19 @@
 package br.com.fiap.cheffy.application.order.usecase;
 
+import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
 import br.com.fiap.cheffy.application.order.dto.OrderItemCommandPort;
+import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
+import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
+import br.com.fiap.cheffy.domain.restaurant.entity.Restaurant;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,9 +23,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CreateOrderUseCaseTest {
 
     @Test
-    void executeCreatesOrderAndReturnsSavedId() {
+    void executeCreatesOrderAndReturnsSavedIdAndTotalAmount() {
         InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
-        CreateOrderUseCase useCase = new CreateOrderUseCase(orderRepository);
+        FoodItemServiceHelper foodItemServiceHelper = new FoodItemServiceHelper(
+                new StubFoodItemRepository(),
+                new StubRestaurantRepository()
+        );
+        CreateOrderUseCase useCase = new CreateOrderUseCase(orderRepository, foodItemServiceHelper);
 
         UUID customerId = UUID.randomUUID();
         UUID restaurantId = UUID.randomUUID();
@@ -28,14 +37,15 @@ class CreateOrderUseCaseTest {
 
         OrderCommandPort command = new OrderCommandPort(
                 restaurantId,
-                List.of(new OrderItemCommandPort(foodItemId, "Burger", 2, new BigDecimal("15.00")))
+                List.of(new OrderItemCommandPort(foodItemId, "payload name", 2, new BigDecimal("999.00")))
         );
 
-        String result = useCase.execute(command, customerId);
+        CreateOrderResultPort result = useCase.execute(command, customerId);
 
         Order savedOrder = orderRepository.lastSavedOrder;
 
-        assertThat(result).isEqualTo(orderRepository.savedId.toString());
+        assertThat(result.orderId()).isEqualTo(orderRepository.savedId);
+        assertThat(result.totalAmount()).isEqualByComparingTo("30.00");
         assertThat(savedOrder.getCustomerId()).isEqualTo(customerId);
         assertThat(savedOrder.getRestaurantId()).isEqualTo(restaurantId);
         assertThat(savedOrder.getStatus()).isEqualTo(OrderStatus.CREATED);
@@ -73,6 +83,92 @@ class CreateOrderUseCaseTest {
         @Override
         public List<Order> findAllByCustomerId(UUID customerId) {
             return List.of();
+        }
+    }
+
+    private static class StubFoodItemRepository implements br.com.fiap.cheffy.domain.fooditem.port.output.FoodItemRepository {
+
+        @Override
+        public FoodItem save(FoodItem foodItem) {
+            return foodItem;
+        }
+
+        @Override
+        public Optional<FoodItem> findById(UUID foodItemId) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<FoodItem> findByIdAndRestaurantId(UUID foodItemId, UUID restaurantId) {
+            return Optional.of(
+                    FoodItem.reconstitute(foodItemId, "Burger", "Delicious", new BigDecimal("15.00"), "photo", true, true, true)
+            );
+        }
+
+        @Override
+        public List<FoodItem> findAllByRestaurantId(UUID restaurantId) {
+            return List.of();
+        }
+
+        @Override
+        public br.com.fiap.cheffy.domain.common.PageResult<FoodItem> findAllByRestaurantId(UUID restaurantId, br.com.fiap.cheffy.domain.common.PageRequest pageRequest) {
+            return null;
+        }
+
+        @Override
+        public br.com.fiap.cheffy.domain.common.PageResult<FoodItem> findAllActiveByRestaurantId(UUID restaurantId, br.com.fiap.cheffy.domain.common.PageRequest pageRequest) {
+            return null;
+        }
+
+        @Override
+        public boolean existsInRestaurantById(UUID restaurantId, UUID foodItemId) {
+            return false;
+        }
+
+        @Override
+        public boolean existsByNameIgnoreCaseAndRestaurantId(String foodName, UUID restaurantId) {
+            return false;
+        }
+    }
+
+    private static class StubRestaurantRepository implements br.com.fiap.cheffy.domain.restaurant.port.output.RestaurantRepository {
+
+        @Override
+        public Restaurant save(Restaurant restaurant) {
+            return restaurant;
+        }
+
+        @Override
+        public boolean existsByCnpj(String cnpj) {
+            return false;
+        }
+
+        @Override
+        public boolean existsByName(String restaurantName) {
+            return false;
+        }
+
+        @Override
+        public boolean existsActiveRestaurantByUserId(UUID userId) {
+            return false;
+        }
+
+        @Override
+        public Optional<Restaurant> findById(UUID restaurantId) {
+            return Optional.of(Restaurant.reconstitute(
+                    restaurantId,
+                    "Test Restaurant",
+                    "12345678000199",
+                    "Burger",
+                    ZoneId.systemDefault(),
+                    null,
+                    null,
+                    true,
+                    true,
+                    null,
+                    null,
+                    new br.com.fiap.cheffy.domain.restaurant.entity.Menu(new java.util.HashSet<>())
+            ));
         }
     }
 }

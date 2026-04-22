@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.presentation.controller;
 
+import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.domain.order.port.input.CreateOrderInput;
 import br.com.fiap.cheffy.presentation.dto.OrderCreateDTO;
 import br.com.fiap.cheffy.presentation.mapper.OrderWebMapper;
@@ -30,13 +31,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createOrder(@RequestBody @Valid OrderCreateDTO orderCreateDTO, @RequestAttribute("userId") UUID userId) {
+    public ResponseEntity<CreateOrderResultPort> createOrder(@RequestBody @Valid OrderCreateDTO orderCreateDTO, @RequestAttribute("userId") UUID userId) {
         log.info("OrderController.createOrder - START - Create order for user [{}]", userId);
 
-        String createdId = createOrderInput.execute(orderWebMapper.toCommand(orderCreateDTO), userId);
+        CreateOrderResultPort createdOrder = createOrderInput.execute(orderWebMapper.toCommand(orderCreateDTO), userId);
 
-        log.info("OrderController.createOrder - END - Order created with id [{}]", createdId);
+        log.info("OrderController.createOrder - END - Order created with id [{}]", createdOrder.orderId());
 
-        return new ResponseEntity<>(createdId, HttpStatus.CREATED);
+        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 }
