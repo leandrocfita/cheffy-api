@@ -2,6 +2,7 @@ package br.com.fiap.cheffy.infrastructure.bean_config;
 
 import br.com.fiap.cheffy.application.address.mapper.AddressQueryMapper;
 import br.com.fiap.cheffy.application.fooditem.mapper.FoodItemQueryMapper;
+import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.profile.mapper.ProfileQueryMapper;
 import br.com.fiap.cheffy.application.restaurant.mapper.ResturantQueryMapper;
 import br.com.fiap.cheffy.application.user.mapper.UserQueryMapper;
@@ -38,5 +39,10 @@ public class ApplicationMapperConfig {
             AddressQueryMapper addressQueryMapper,
             FoodItemQueryMapper foodItemQueryMapper) {
         return new ResturantQueryMapper(addressQueryMapper, foodItemQueryMapper);
+    }
+
+    @Bean
+    public OrderQueryMapper orderQueryMapper() {
+        return new OrderQueryMapper();
     }
 }
