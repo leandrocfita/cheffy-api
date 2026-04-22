@@ -5,6 +5,7 @@ import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.order.usecase.CreateOrderUseCase;
 import br.com.fiap.cheffy.application.order.usecase.FindOrderByIdUseCase;
 import br.com.fiap.cheffy.application.order.usecase.ListOrdersByCustomerUseCase;
+import br.com.fiap.cheffy.domain.order.port.output.OrderCreatedEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +16,10 @@ public class OrderUseCaseConfig {
     @Bean
     public CreateOrderUseCase createOrderUseCase(
             OrderRepository orderRepository,
-            FoodItemServiceHelper foodItemServiceHelper
+            FoodItemServiceHelper foodItemServiceHelper,
+            OrderCreatedEventPublisher orderCreatedEventPublisher
     ) {
-        return new CreateOrderUseCase(orderRepository, foodItemServiceHelper);
+        return new CreateOrderUseCase(orderRepository, foodItemServiceHelper, orderCreatedEventPublisher);
     }
 
     @Bean

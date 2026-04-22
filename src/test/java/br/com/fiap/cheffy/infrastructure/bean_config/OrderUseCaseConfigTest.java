@@ -5,6 +5,7 @@ import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.order.usecase.CreateOrderUseCase;
 import br.com.fiap.cheffy.application.order.usecase.FindOrderByIdUseCase;
 import br.com.fiap.cheffy.application.order.usecase.ListOrdersByCustomerUseCase;
+import br.com.fiap.cheffy.domain.order.port.output.OrderCreatedEventPublisher;
 import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
@@ -29,7 +30,11 @@ class OrderUseCaseConfigTest {
     void createOrderUseCaseCreatesBean() {
         OrderUseCaseConfig config = new OrderUseCaseConfig();
 
-        CreateOrderUseCase useCase = config.createOrderUseCase(new StubOrderRepository(), new StubFoodItemServiceHelper());
+        CreateOrderUseCase useCase = config.createOrderUseCase(
+                new StubOrderRepository(),
+                new StubFoodItemServiceHelper(),
+                new StubOrderCreatedEventPublisher()
+        );
 
         assertThat(useCase).isNotNull();
     }
@@ -67,6 +72,13 @@ class OrderUseCaseConfigTest {
         @Override
         public List<Order> findAllByCustomerId(UUID customerId) {
             return List.of();
+        }
+    }
+
+    private static class StubOrderCreatedEventPublisher implements OrderCreatedEventPublisher {
+
+        @Override
+        public void publish(br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort event) {
         }
     }
 

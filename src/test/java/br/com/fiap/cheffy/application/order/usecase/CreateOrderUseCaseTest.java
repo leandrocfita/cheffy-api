@@ -2,12 +2,14 @@ package br.com.fiap.cheffy.application.order.usecase;
 
 import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
+import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
 import br.com.fiap.cheffy.application.order.dto.OrderItemCommandPort;
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
+import br.com.fiap.cheffy.domain.order.port.output.OrderCreatedEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import br.com.fiap.cheffy.domain.restaurant.entity.Restaurant;
 import org.junit.jupiter.api.Test;
@@ -25,11 +27,12 @@ class CreateOrderUseCaseTest {
     @Test
     void executeCreatesOrderAndReturnsSavedIdAndTotalAmount() {
         InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
+        InMemoryOrderCreatedEventPublisher eventPublisher = new InMemoryOrderCreatedEventPublisher();
         FoodItemServiceHelper foodItemServiceHelper = new FoodItemServiceHelper(
                 new StubFoodItemRepository(),
                 new StubRestaurantRepository()
         );
-        CreateOrderUseCase useCase = new CreateOrderUseCase(orderRepository, foodItemServiceHelper);
+        CreateOrderUseCase useCase = new CreateOrderUseCase(orderRepository, foodItemServiceHelper, eventPublisher);
 
         UUID customerId = UUID.randomUUID();
         UUID restaurantId = UUID.randomUUID();
@@ -56,6 +59,12 @@ class CreateOrderUseCaseTest {
         assertThat(savedItem.getName()).isEqualTo("Burger");
         assertThat(savedItem.getQuantity()).isEqualTo(2);
         assertThat(savedItem.getPrice().value()).isEqualByComparingTo("15.00");
+        assertThat(eventPublisher.publishedEvent).isNotNull();
+        assertThat(eventPublisher.publishedEvent.orderId()).isEqualTo(orderRepository.savedId);
+        assertThat(eventPublisher.publishedEvent.customerId()).isEqualTo(customerId);
+        assertThat(eventPublisher.publishedEvent.restaurantId()).isEqualTo(restaurantId);
+        assertThat(eventPublisher.publishedEvent.totalAmount()).isEqualByComparingTo("30.00");
+        assertThat(eventPublisher.publishedEvent.items()).hasSize(1);
     }
 
     private static class InMemoryOrderRepository implements OrderRepository {
@@ -83,6 +92,16 @@ class CreateOrderUseCaseTest {
         @Override
         public List<Order> findAllByCustomerId(UUID customerId) {
             return List.of();
+        }
+    }
+
+    private static class InMemoryOrderCreatedEventPublisher implements OrderCreatedEventPublisher {
+
+        private OrderCreatedEventPort publishedEvent;
+
+        @Override
+        public void publish(OrderCreatedEventPort event) {
+            this.publishedEvent = event;
         }
     }
 
