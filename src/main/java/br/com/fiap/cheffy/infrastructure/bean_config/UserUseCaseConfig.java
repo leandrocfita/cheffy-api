@@ -55,15 +55,6 @@ public class UserUseCaseConfig {
                 authClient);
     }
 
-//    @Bean
-//    public UpdateUserPasswordUseCase updateUserPasswordUseCase(
-//            UserRepository userRepository
-//    ) {
-//        return new UpdateUserPasswordUseCase(
-//                userRepository
-//        );
-//    }
-
     @Bean
     public UserServiceHelper userServiceHelper(
             UserRepository userRepository,
@@ -74,17 +65,6 @@ public class UserUseCaseConfig {
                 mapper);
 
     }
-
-//    @Bean
-//    public LoginUseCase loginUseCase(
-//            AuthenticationManagerPort authenticationManagerPort,
-//            TokenGeneratorPort tokenGeneratorPort
-//    ){
-//        return new LoginUseCase(
-//                authenticationManagerPort,
-//                tokenGeneratorPort
-//        );
-//    }
 
     @Bean
     public AddAddressUseCase addAddressUseCase(

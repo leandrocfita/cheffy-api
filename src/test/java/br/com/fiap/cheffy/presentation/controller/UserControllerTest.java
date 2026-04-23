@@ -56,18 +56,6 @@
 //        assertThat(response.getBody()).isEqualTo(userId);
 //    }
 //
-//    @Test
-//    void updateUserPasswordReturnsOk() {
-//        UUID id = UUID.randomUUID();
-//        UserUpdatePasswordDTO dto = new UserUpdatePasswordDTO("NewPass@123");
-//        when(mapper.toCommand(dto)).thenReturn(new UserCommandPort(null, null, null, "NewPass@123", null));
-//
-//        ResponseEntity<UUID> response = userController.updateUserPassword(id, dto);
-//
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//        assertThat(response.getBody()).isEqualTo(id);
-//        verify(updateUserPasswordInput).execute(any(), eq(id));
-//    }
 //
 //    @Test
 //    void updateUserReturnsNoContent() {
