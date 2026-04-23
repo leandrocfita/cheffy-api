@@ -2,10 +2,11 @@ package br.com.fiap.cheffy.application.order.usecase;
 
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.order.port.input.ListOrdersByCustomerInput;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ListOrdersByCustomerUseCase implements ListOrdersByCustomerInput {
@@ -19,10 +20,8 @@ public class ListOrdersByCustomerUseCase implements ListOrdersByCustomerInput {
     }
 
     @Override
-    public List<OrderQueryPort> execute(UUID customerId) {
-        return orderRepository.findAllByCustomerId(customerId)
-                .stream()
-                .map(orderQueryMapper::toQueryPort)
-                .toList();
+    public PageResult<OrderQueryPort> execute(UUID customerId, PageRequest pageRequest) {
+        PageResult<br.com.fiap.cheffy.domain.order.entity.Order> orders = orderRepository.findAllByCustomerId(customerId, pageRequest);
+        return PageResult.from(orders, orders.content().stream().map(orderQueryMapper::toQueryPort).toList());
     }
 }
