@@ -69,8 +69,11 @@ class FindOrderByIdUseCaseTest {
         }
 
         @Override
-        public List<Order> findAllByCustomerId(UUID customerId) {
-            return List.of();
+        public br.com.fiap.cheffy.domain.common.PageResult<Order> findAllByCustomerId(
+                UUID customerId,
+                br.com.fiap.cheffy.domain.common.PageRequest pageRequest
+        ) {
+            return br.com.fiap.cheffy.domain.common.PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
         }
     }
 }

@@ -2,6 +2,8 @@ package br.com.fiap.cheffy.application.order.usecase;
 
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
@@ -22,11 +24,13 @@ class ListOrdersByCustomerUseCaseTest {
         UUID customerId = UUID.randomUUID();
         ListOrdersByCustomerUseCase useCase = new ListOrdersByCustomerUseCase(new StubOrderRepository(customerId), new OrderQueryMapper());
 
-        List<OrderQueryPort> result = useCase.execute(customerId);
+        PageRequest pageRequest = PageRequest.of(0, 10, "dateCreated", PageRequest.SortDirection.DESC);
 
-        assertThat(result).hasSize(2);
-        assertThat(result.getFirst().customerId()).isEqualTo(customerId);
-        assertThat(result.getFirst().items()).hasSize(1);
+        PageResult<OrderQueryPort> result = useCase.execute(customerId, pageRequest);
+
+        assertThat(result.content()).hasSize(2);
+        assertThat(result.content().getFirst().customerId()).isEqualTo(customerId);
+        assertThat(result.content().getFirst().items()).hasSize(1);
     }
 
     private static class StubOrderRepository implements OrderRepository {
@@ -63,8 +67,8 @@ class ListOrdersByCustomerUseCaseTest {
         }
 
         @Override
-        public List<Order> findAllByCustomerId(UUID customerId) {
-            return orders;
+        public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
+            return PageResult.of(orders, pageRequest.page(), pageRequest.size(), orders.size());
         }
     }
 }

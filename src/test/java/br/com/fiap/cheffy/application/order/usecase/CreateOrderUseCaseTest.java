@@ -37,7 +37,7 @@ class CreateOrderUseCaseTest {
 
         OrderCommandPort command = new OrderCommandPort(
                 restaurantId,
-                List.of(new OrderItemCommandPort(foodItemId, "payload name", 2, new BigDecimal("999.00")))
+                List.of(new OrderItemCommandPort(foodItemId, 2))
         );
 
         CreateOrderResultPort result = useCase.execute(command, customerId);
@@ -81,8 +81,11 @@ class CreateOrderUseCaseTest {
         }
 
         @Override
-        public List<Order> findAllByCustomerId(UUID customerId) {
-            return List.of();
+        public br.com.fiap.cheffy.domain.common.PageResult<Order> findAllByCustomerId(
+                UUID customerId,
+                br.com.fiap.cheffy.domain.common.PageRequest pageRequest
+        ) {
+            return br.com.fiap.cheffy.domain.common.PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
         }
     }
 
