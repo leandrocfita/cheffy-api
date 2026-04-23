@@ -12,7 +12,6 @@ import br.com.fiap.cheffy.presentation.dto.AddressCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.AddressPatchDTO;
 import br.com.fiap.cheffy.presentation.dto.UserCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.UserUpdateDTO;
-import br.com.fiap.cheffy.presentation.dto.UserUpdatePasswordDTO;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -77,13 +76,6 @@ public interface UserControllerDocs {
             )
     )
     ResponseEntity<String> createUser(@Valid UserCreateDTO userCreateDTO);
-
-//    @Operation(summary = "Atualizar senha do usuário")
-//    @ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso")
-//    @DefaultBadRequestApiResponse
-//    @DefaultApiErrors
-//    @DefaultNotFoundApiResponse
-//    ResponseEntity<UUID> updateUserPassword(UUID id, @Valid UserUpdatePasswordDTO userUpdatePasswordDTO);
 
     @Operation(summary = "Atualizar usuário", description = "Atualização parcial - apenas campos enviados são modificados")
     @ApiResponse(responseCode = "204", description = "Usuário atualizado com sucesso")

@@ -103,68 +103,10 @@
 //                .andExpect(status().isNotFound());
 //    }
 //
-//    @Test
-//    @WithMockUser(username = "integration-user")
-//    void shouldUpdateUserPasswordSuccessfully() throws Exception {
-//        // 1. Create a user
-//        var createRequest = IntegrationTestUserHelper.buildUserCreateRequest(
-//                "Ana Senha",
-//                "ana.senha@cheffy.com",
-//                "ana.senha",
-//                "SenhaAntiga@2026",
-//                true
-//        );
-//
-//        String userIdStr = IntegrationTestUserHelper.createUserAndReturnId(mockMvc, objectMapper, createRequest);
-//        UUID userId = UUID.fromString(userIdStr);
-//
-//        // 2. Build Password Update Request
-//        var passwordUpdateRequest = new UserUpdatePasswordDTO("SenhaNova@2027");
-//
-//        // 3. Perform Password Update
-//        mockMvc.perform(patch("/api/v1/users/{id}/password", userId)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(passwordUpdateRequest)))
-//                .andExpect(status().isOk());
-//
-//        // 4. Verify in DB
-//        var updatedUser = userJpaRepository.findById(userId);
-//        assertThat(updatedUser).isPresent();
-//        assertThat(passwordEncoder.matches("SenhaNova@2027", updatedUser.get().getPassword())).isTrue();
-//    }
-//
-//    @Test
-//    @WithMockUser(username = "integration-user")
-//    void shouldReturnBadRequestWhenPasswordUpdateHasInvalidFormat() throws Exception {
-//        // 1. Create a user
-//        var createRequest = IntegrationTestUserHelper.buildUserCreateRequest(
-//                "Ana Fraca",
-//                "ana.fraca@cheffy.com",
-//                "ana.fraca",
-//                "SenhaAntiga@2026",
-//                true
-//        );
-//
-//        String userIdStr = IntegrationTestUserHelper.createUserAndReturnId(mockMvc, objectMapper, createRequest);
-//        UUID userId = UUID.fromString(userIdStr);
-//
-//        // 2. Build Password Update Request with weak password (assuming custom validation exists)
-//        var passwordUpdateRequest = new UserUpdatePasswordDTO("fraca");
-//
-//        // 3. Perform Password Update and expect Bad Request
-//        mockMvc.perform(patch("/api/v1/users/{id}/password", userId)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(passwordUpdateRequest)))
-//                .andExpect(status().isBadRequest());
-//    }
-//
 //    private record UserUpdateDTO(
 //            String name,
 //            String email,
 //            String login
 //    ) {}
 //
-//    private record UserUpdatePasswordDTO(
-//            String password
-//    ) {}
 //}

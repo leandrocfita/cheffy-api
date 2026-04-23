@@ -66,8 +66,6 @@
 //        LoginUseCase login = config.loginUseCase(authManager, tokenGenerator);
 //        assertThat(login).isNotNull();
 //
-//        UpdateUserPasswordUseCase updatePassword = config.updateUserPasswordUseCase(userRepository);
-//        assertThat(updatePassword).isNotNull();
 //
 //        ListAllUsersUseCase listAll = config.listAllUsersUseCase(userRepository, userQueryMapper);
 //        assertThat(listAll).isNotNull();

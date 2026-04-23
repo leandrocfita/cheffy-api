@@ -10,7 +10,6 @@ import br.com.fiap.cheffy.presentation.config.swagger.docs.UserControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.AddressCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.AddressPatchDTO;
 import br.com.fiap.cheffy.presentation.dto.UserCreateDTO;
-import br.com.fiap.cheffy.presentation.dto.UserUpdatePasswordDTO;
 import br.com.fiap.cheffy.presentation.dto.UserUpdateDTO;
 import br.com.fiap.cheffy.presentation.mapper.UserWebMapper;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -23,8 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,16 +87,6 @@ public class UserController implements UserControllerDocs {
         MDC.clear();
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
-
-//    @Override
-//    @PatchMapping("/{id}/password")
-//    public ResponseEntity<UUID> updateUserPassword(@PathVariable final UUID id,
-//                                                   @RequestBody @Valid final UserUpdatePasswordDTO userUpdatePasswordDTO) {
-//        log.info("UserController.updateUserPassword - START - Update password for user [{}]", id);
-//        updateUserPasswordInput.execute(mapper.toCommand(userUpdatePasswordDTO), id);
-//        log.info("UserController.updateUserPassword - END - Password updated for user [{}]", id);
-//        return ResponseEntity.ok(id);
-//    }
 
     @Override
     @PatchMapping("/{id}")
