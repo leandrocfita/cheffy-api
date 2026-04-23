@@ -29,7 +29,9 @@ public class OrderPersistenceMapper {
 
     public OrderJpaEntity toJpa(Order domain) {
         OrderJpaEntity entity = new OrderJpaEntity();
-        entity.setId(domain.getId());
+        if (domain.getId() != null) {
+            entity.setId(domain.getId());
+        }
         entity.setCustomerId(domain.getCustomerId());
         entity.setRestaurantId(domain.getRestaurantId());
         entity.setTotalAmount(domain.getTotalAmount().value());

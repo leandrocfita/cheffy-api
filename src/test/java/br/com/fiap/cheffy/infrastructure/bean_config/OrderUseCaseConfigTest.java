@@ -65,8 +65,8 @@ class OrderUseCaseConfigTest {
         }
 
         @Override
-        public List<Order> findAllByCustomerId(UUID customerId) {
-            return List.of();
+        public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
+            return PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
         }
     }
 

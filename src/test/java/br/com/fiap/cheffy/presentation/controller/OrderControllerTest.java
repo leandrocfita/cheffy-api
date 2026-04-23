@@ -4,6 +4,8 @@ import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
 import br.com.fiap.cheffy.application.order.dto.OrderItemQueryPort;
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.order.port.input.CreateOrderInput;
 import br.com.fiap.cheffy.domain.order.port.input.FindOrderByIdInput;
 import br.com.fiap.cheffy.domain.order.port.input.ListOrdersByCustomerInput;
@@ -12,6 +14,7 @@ import br.com.fiap.cheffy.presentation.dto.OrderCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.OrderItemDTO;
 import br.com.fiap.cheffy.presentation.mapper.OrderWebMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -39,7 +42,7 @@ class OrderControllerTest {
 
         OrderCreateDTO dto = new OrderCreateDTO(
                 restaurantId,
-                List.of(new OrderItemDTO(foodItemId, "Burger", 2, new BigDecimal("15.00")))
+                List.of(new OrderItemDTO(foodItemId, 2))
         );
 
         ResponseEntity<CreateOrderResultPort> response = controller.createOrder(dto, userId);
@@ -87,11 +90,20 @@ class OrderControllerTest {
 
         UUID userId = UUID.randomUUID();
 
-        ResponseEntity<List<OrderQueryPort>> response = controller.listByCustomer(userId);
+        ResponseEntity<PageResult<OrderQueryPort>> response = controller.listByCustomer(
+                userId,
+                0,
+                10,
+                "dateCreated",
+                Sort.Direction.DESC
+        );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).hasSize(1);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().content()).hasSize(1);
         assertThat(listOrdersByCustomerInput.customerId).isEqualTo(userId);
+        assertThat(listOrdersByCustomerInput.pageRequest.sortBy()).isEqualTo("dateCreated");
+        assertThat(listOrdersByCustomerInput.pageRequest.direction()).isEqualTo(PageRequest.SortDirection.DESC);
     }
 
     private static class InMemoryCreateOrderInput implements CreateOrderInput {
@@ -129,11 +141,13 @@ class OrderControllerTest {
     private static class InMemoryListOrdersByCustomerInput implements ListOrdersByCustomerInput {
 
         private UUID customerId;
+        private PageRequest pageRequest;
 
         @Override
-        public List<OrderQueryPort> execute(UUID customerId) {
+        public PageResult<OrderQueryPort> execute(UUID customerId, PageRequest pageRequest) {
             this.customerId = customerId;
-            return List.of(
+            this.pageRequest = pageRequest;
+            List<OrderQueryPort> orders = List.of(
                     new OrderQueryPort(
                             UUID.randomUUID(),
                             customerId,
@@ -143,6 +157,7 @@ class OrderControllerTest {
                             List.of(new OrderItemQueryPort(UUID.randomUUID(), "Burger", 2, new BigDecimal("15.00")))
                     )
             );
+            return PageResult.of(orders, pageRequest.page(), pageRequest.size(), orders.size());
         }
     }
 }

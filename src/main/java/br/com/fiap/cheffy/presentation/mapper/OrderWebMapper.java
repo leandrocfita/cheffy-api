@@ -14,9 +14,7 @@ public class OrderWebMapper {
                 dto.items().stream()
                         .map(item -> new OrderItemCommandPort(
                                 item.foodItemId(),
-                                item.name(),
-                                item.quantity(),
-                                item.price()
+                                item.quantity()
                         ))
                         .toList()
         );
