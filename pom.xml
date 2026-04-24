@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>3.4.5</version>
         <relativePath/><!-- lookup parent from repository -->
     </parent>
     <groupId>br.com.fiap</groupId>
@@ -14,11 +14,25 @@
     <name>cheffy</name>
 
     <properties>
+        <spring.version>3.4.5</spring.version>
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
         <java.version>21</java.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <sonar.organization>rodfc773</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -85,6 +99,12 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
         <!--SECURITY-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -111,6 +131,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!--OPENFEIGN-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
     </dependencies>
 

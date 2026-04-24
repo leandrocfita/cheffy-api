@@ -12,10 +12,6 @@ public interface UserRepository {
 
     User save(User user);
 
-    boolean existsByEmailOrLogin(String email, String login);
-
-    Optional<User> findByLogin(String login);
-
     Optional<User> findByEmail(String email);
 
     Optional<User> findById(UUID id);

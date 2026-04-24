@@ -28,16 +28,6 @@ public class UserWebMapper {
         );
     }
 
-    public UserCommandPort toCommand(UserUpdatePasswordDTO userUpdatePasswordDTO) {
-        return new UserCommandPort(
-                null,
-                null,
-                null,
-                userUpdatePasswordDTO.password(),
-                null
-        );
-    }
-
     public UserCommandPort toCommand(UserUpdateDTO userUpdateDTO) {
         return new UserCommandPort(
                 userUpdateDTO.name(),

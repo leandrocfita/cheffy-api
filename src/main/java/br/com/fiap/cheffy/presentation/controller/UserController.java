@@ -4,11 +4,12 @@ import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.user.port.input.*;
 import br.com.fiap.cheffy.application.user.dto.UserQueryPort;
+import br.com.fiap.cheffy.infrastructure.security.model.CurrentUser;
+import br.com.fiap.cheffy.infrastructure.security.resolver.CurrentUserMapper;
 import br.com.fiap.cheffy.presentation.config.swagger.docs.UserControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.AddressCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.AddressPatchDTO;
 import br.com.fiap.cheffy.presentation.dto.UserCreateDTO;
-import br.com.fiap.cheffy.presentation.dto.UserUpdatePasswordDTO;
 import br.com.fiap.cheffy.presentation.dto.UserUpdateDTO;
 import br.com.fiap.cheffy.presentation.mapper.UserWebMapper;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -32,7 +35,7 @@ public class UserController implements UserControllerDocs {
     private final CreateUserInput createUserInput;
     private final DeactivateUserInput deactivateUserInput;
     private final ReactivateUserInput reactivateUserInput;
-    private final UpdateUserPasswordInput updateUserPasswordInput;
+//    private final UpdateUserPasswordInput updateUserPasswordInput;
     private final UpdateUserInput updateUserInput;
     private final AddAddressInput addAddressInput;
     private final UpdateAddressInput updateAddressInput;
@@ -50,7 +53,7 @@ public class UserController implements UserControllerDocs {
             CreateUserInput createUserInput,
             DeactivateUserInput deactivateUserInput,
             ReactivateUserInput reactivateUserInput,
-            UpdateUserPasswordInput updateUserPasswordInput,
+//            UpdateUserPasswordInput updateUserPasswordInput,
             UpdateUserInput updateUserInput,
             AddAddressInput addAddressInput,
             UpdateAddressInput updateAddressInput,
@@ -61,7 +64,7 @@ public class UserController implements UserControllerDocs {
 
 
     {
-        this.updateUserPasswordInput = updateUserPasswordInput;
+//        this.updateUserPasswordInput = updateUserPasswordInput;
         this.createUserInput = createUserInput;
         this.deactivateUserInput = deactivateUserInput;
         this.reactivateUserInput = reactivateUserInput;
@@ -83,16 +86,6 @@ public class UserController implements UserControllerDocs {
         log.info("UserController.createTbUser - END - User created with id [{}]", createdId);
         MDC.clear();
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
-    }
-
-    @Override
-    @PatchMapping("/{id}/password")
-    public ResponseEntity<UUID> updateUserPassword(@PathVariable final UUID id,
-                                                   @RequestBody @Valid final UserUpdatePasswordDTO userUpdatePasswordDTO) {
-        log.info("UserController.updateUserPassword - START - Update password for user [{}]", id);
-        updateUserPasswordInput.execute(mapper.toCommand(userUpdatePasswordDTO), id);
-        log.info("UserController.updateUserPassword - END - Password updated for user [{}]", id);
-        return ResponseEntity.ok(id);
     }
 
     @Override
@@ -201,8 +194,17 @@ public class UserController implements UserControllerDocs {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<UserQueryPort> findUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserQueryPort> findUserById(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt,
+            CurrentUserMapper currentUserMapper) {
         log.info("UserController.findUserById - START - Finding user [{}]", id);
+
+        CurrentUser cuser = currentUserMapper.from(jwt);
+
+        //TODO: Remover, apenas para debug e exemplo
+        log.info("##### CurrentUser: id={}, login={}", cuser.id(), cuser.login());
+
 
         var user = findUserByIdInput.execute(id);
 

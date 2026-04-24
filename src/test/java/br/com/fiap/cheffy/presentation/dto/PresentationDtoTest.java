@@ -57,12 +57,6 @@ class PresentationDtoTest {
     }
 
     @Test
-    void createUserUpdatePasswordDTO() {
-        UserUpdatePasswordDTO dto = new UserUpdatePasswordDTO("NewPass@123");
-        assertThat(dto.password()).isEqualTo("NewPass@123");
-    }
-
-    @Test
     void createRestaurantCreateDTO() {
         RestaurantAddressCreateDTO addr = new RestaurantAddressCreateDTO("St", 1, "City", "12345678", "Hood", "SP", null);
         RestaurantCreateDTO dto = new RestaurantCreateDTO("Name", "Brasileira", "27865757000102", null, null, "America/Sao_Paulo", false, addr);
