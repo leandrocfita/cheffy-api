@@ -43,7 +43,7 @@ public class CreateOrderUseCase implements CreateOrderInput {
     }
 
     private OrderItem toOrderItem(OrderItemCommandPort item, UUID restaurantId) {
-        FoodItem foodItem = foodItemServiceHelper.getFoodItemOrFail(item.foodItemId(), restaurantId);
+        FoodItem foodItem = foodItemServiceHelper.getAvailableFoodItemOrFail(item.foodItemId(), restaurantId);
 
         return OrderItem.create(
                 foodItem.getId(),
