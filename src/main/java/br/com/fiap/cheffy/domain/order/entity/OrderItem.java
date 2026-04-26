@@ -28,7 +28,7 @@ public class OrderItem {
         Objects.requireNonNull(quantity);
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
+            throw new IllegalArgumentException("A quantidade deve ser maior que zero");
         }
 
         return quantity;

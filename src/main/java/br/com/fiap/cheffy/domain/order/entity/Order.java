@@ -35,14 +35,12 @@ public class Order {
     }
 
     private List<OrderItem> validateItems(List<OrderItem> items) {
-        Objects.requireNonNull(items, "Items list must not be null");
-
         if (items.isEmpty()) {
-            throw new IllegalArgumentException("Order must contain at least one item");
+            throw new IllegalArgumentException("O pedido deve conter pelo menos um item");
         }
 
         if (items.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Order items must not contain null elements");
+            throw new IllegalArgumentException("Os itens do pedido não podem conter elementos nulos");
         }
 
         return List.copyOf(items);
