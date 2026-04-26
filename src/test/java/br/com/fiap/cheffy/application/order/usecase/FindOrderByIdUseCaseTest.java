@@ -2,6 +2,8 @@ package br.com.fiap.cheffy.application.order.usecase;
 
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
@@ -69,11 +71,11 @@ class FindOrderByIdUseCaseTest {
         }
 
         @Override
-        public br.com.fiap.cheffy.domain.common.PageResult<Order> findAllByCustomerId(
+        public PageResult<Order> findAllByCustomerId(
                 UUID customerId,
-                br.com.fiap.cheffy.domain.common.PageRequest pageRequest
+                PageRequest pageRequest
         ) {
-            return br.com.fiap.cheffy.domain.common.PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
+            return PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
         }
     }
 }

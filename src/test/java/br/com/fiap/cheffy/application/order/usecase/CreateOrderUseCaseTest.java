@@ -4,17 +4,23 @@ import br.com.fiap.cheffy.application.order.dto.CreateOrderResultPort;
 import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
 import br.com.fiap.cheffy.application.order.dto.OrderItemCommandPort;
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemUnavailableForOrderException;
+import br.com.fiap.cheffy.domain.fooditem.port.output.FoodItemRepository;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
+import br.com.fiap.cheffy.domain.restaurant.entity.Menu;
 import br.com.fiap.cheffy.domain.restaurant.entity.Restaurant;
+import br.com.fiap.cheffy.domain.restaurant.port.output.RestaurantRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -104,15 +110,15 @@ class CreateOrderUseCaseTest {
         }
 
         @Override
-        public br.com.fiap.cheffy.domain.common.PageResult<Order> findAllByCustomerId(
+        public PageResult<Order> findAllByCustomerId(
                 UUID customerId,
-                br.com.fiap.cheffy.domain.common.PageRequest pageRequest
+                PageRequest pageRequest
         ) {
-            return br.com.fiap.cheffy.domain.common.PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
+            return PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
         }
     }
 
-    private static class StubFoodItemRepository implements br.com.fiap.cheffy.domain.fooditem.port.output.FoodItemRepository {
+    private static class StubFoodItemRepository implements FoodItemRepository {
 
         @Override
         public FoodItem save(FoodItem foodItem) {
@@ -137,12 +143,12 @@ class CreateOrderUseCaseTest {
         }
 
         @Override
-        public br.com.fiap.cheffy.domain.common.PageResult<FoodItem> findAllByRestaurantId(UUID restaurantId, br.com.fiap.cheffy.domain.common.PageRequest pageRequest) {
+        public PageResult<FoodItem> findAllByRestaurantId(UUID restaurantId, PageRequest pageRequest) {
             return null;
         }
 
         @Override
-        public br.com.fiap.cheffy.domain.common.PageResult<FoodItem> findAllActiveByRestaurantId(UUID restaurantId, br.com.fiap.cheffy.domain.common.PageRequest pageRequest) {
+        public PageResult<FoodItem> findAllActiveByRestaurantId(UUID restaurantId, PageRequest pageRequest) {
             return null;
         }
 
@@ -167,7 +173,7 @@ class CreateOrderUseCaseTest {
         }
     }
 
-    private static class StubRestaurantRepository implements br.com.fiap.cheffy.domain.restaurant.port.output.RestaurantRepository {
+    private static class StubRestaurantRepository implements RestaurantRepository {
 
         @Override
         public Restaurant save(Restaurant restaurant) {
@@ -203,7 +209,7 @@ class CreateOrderUseCaseTest {
                     true,
                     null,
                     null,
-                    new br.com.fiap.cheffy.domain.restaurant.entity.Menu(new java.util.HashSet<>())
+                    new Menu(new HashSet<>())
             ));
         }
     }

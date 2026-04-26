@@ -4,10 +4,12 @@ import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
+import br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.order.mapper.OrderPersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.order.repository.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.PageRequest.of;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,26 +50,25 @@ public class OrderRepositoryImpl implements OrderRepository {
                 ? Sort.by(pageRequest.sortBy()).descending()
                 : Sort.by(pageRequest.sortBy()).ascending();
 
-        org.springframework.data.domain.PageRequest springPageRequest =
-                org.springframework.data.domain.PageRequest.of(pageRequest.page(), pageRequest.size(), sort);
+        Pageable springPageRequest = of(pageRequest.page(), pageRequest.size(), sort);
 
-        Page<br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity> page =
+        Page<OrderJpaEntity> page =
                 orderJpaRepository.findAllByCustomerId(customerId, springPageRequest);
 
         List<UUID> orderIds = page.getContent()
                 .stream()
-                .map(br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity::getId)
+                .map(OrderJpaEntity::getId)
                 .toList();
 
         if (orderIds.isEmpty()) {
             return PageResult.of(Collections.emptyList(), pageRequest.page(), pageRequest.size(), page.getTotalElements());
         }
 
-        Map<UUID, br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity> ordersById =
+        Map<UUID, OrderJpaEntity> ordersById =
                 orderJpaRepository.findAllByIdInWithItems(orderIds)
                         .stream()
                         .collect(Collectors.toMap(
-                                br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity::getId,
+                                OrderJpaEntity::getId,
                                 Function.identity(),
                                 (first, ignored) -> first,
                                 LinkedHashMap::new
