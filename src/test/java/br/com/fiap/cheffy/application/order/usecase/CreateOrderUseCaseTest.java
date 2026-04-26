@@ -5,6 +5,7 @@ import br.com.fiap.cheffy.application.order.dto.OrderCommandPort;
 import br.com.fiap.cheffy.application.order.dto.OrderItemCommandPort;
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
+import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemUnavailableForOrderException;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CreateOrderUseCaseTest {
 
@@ -56,6 +58,27 @@ class CreateOrderUseCaseTest {
         assertThat(savedItem.getName()).isEqualTo("Burger");
         assertThat(savedItem.getQuantity()).isEqualTo(2);
         assertThat(savedItem.getPrice().value()).isEqualByComparingTo("15.00");
+    }
+
+    @Test
+    void executeThrowsWhenFoodItemIsUnavailable() {
+        InMemoryOrderRepository orderRepository = new InMemoryOrderRepository();
+        FoodItemServiceHelper foodItemServiceHelper = new FoodItemServiceHelper(
+                new UnavailableFoodItemRepository(),
+                new StubRestaurantRepository()
+        );
+        CreateOrderUseCase useCase = new CreateOrderUseCase(orderRepository, foodItemServiceHelper);
+
+        UUID customerId = UUID.randomUUID();
+        UUID restaurantId = UUID.randomUUID();
+        UUID foodItemId = UUID.randomUUID();
+
+        OrderCommandPort command = new OrderCommandPort(
+                restaurantId,
+                List.of(new OrderItemCommandPort(foodItemId, 1))
+        );
+
+        assertThrows(FoodItemUnavailableForOrderException.class, () -> useCase.execute(command, customerId));
     }
 
     private static class InMemoryOrderRepository implements OrderRepository {
@@ -131,6 +154,16 @@ class CreateOrderUseCaseTest {
         @Override
         public boolean existsByNameIgnoreCaseAndRestaurantId(String foodName, UUID restaurantId) {
             return false;
+        }
+    }
+
+    private static class UnavailableFoodItemRepository extends StubFoodItemRepository {
+
+        @Override
+        public Optional<FoodItem> findByIdAndRestaurantId(UUID foodItemId, UUID restaurantId) {
+            return Optional.of(
+                    FoodItem.reconstitute(foodItemId, "Burger", "Delicious", new BigDecimal("15.00"), "photo", true, false, true)
+            );
         }
     }
 
