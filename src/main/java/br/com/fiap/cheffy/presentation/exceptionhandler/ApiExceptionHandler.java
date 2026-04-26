@@ -4,6 +4,7 @@ import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemAlreadyExistInRestau
 import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemDoesNotExist;
 import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemNotFoundException;
 import br.com.fiap.cheffy.domain.fooditem.exception.FoodItemUnavailableForOrderException;
+import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
 import br.com.fiap.cheffy.domain.profile.exception.ProfileAlreadyExistException;
 import br.com.fiap.cheffy.domain.profile.exception.ProfileIsOwnerOrClientException;
 import br.com.fiap.cheffy.domain.profile.exception.ProfileNotFoundException;
@@ -477,6 +478,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FoodItemNotFoundException.class)
     public ResponseEntity<Object> handleFoodItemNotFoundException(FoodItemNotFoundException ex, WebRequest request) {
+        String title = getExceptionName(ex);
+        String message = getMessage(ex.getMessage());
+        message = String.format(message, ex.getId().toString());
+
+        HttpStatus httpStatusCode = HttpStatus.NOT_FOUND;
+
+        Problem problem = createProblemBuilder(
+                httpStatusCode,
+                title,
+                message)
+                .userMessage(message)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), httpStatusCode, request);
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Object> handleOrderNotFoundException(OrderNotFoundException ex, WebRequest request) {
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
         message = String.format(message, ex.getId().toString());
