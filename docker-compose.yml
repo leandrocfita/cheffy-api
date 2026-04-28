@@ -22,7 +22,7 @@ services:
       context: .
       args:
         # Passa o valor para o Dockerfile. O nome do host é 'postgres' (o nome do serviço)
-        DB_HOST_ARG: $DB_HOST
+        DB_HOST_ARG: $DB_HOSTd
         POSTGRES_PASSWORD_ARG: $POSTGRES_PASSWORD
         DB_PORT_ARG: $DB_PORT
     ports:
@@ -97,6 +97,19 @@ services:
       - mongo-data:/data/db
     networks:
       - cheffy-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-cheffy-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - cheffy-network
+    depends_on:
+      - kafka
 
 networks:
   cheffy-network:

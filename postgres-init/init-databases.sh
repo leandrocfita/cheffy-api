@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 # The 'psql' command is available because this script runs inside the postgres container.
