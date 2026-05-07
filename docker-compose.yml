@@ -110,6 +110,13 @@ services:
       - cheffy-network
     depends_on:
       - kafka
+  procpag:
+    image: docker.io/erickemprobr/procpag:latest
+    platform: linux/amd64
+    ports:
+      - "8065:8065"
+    networks:
+      - cheffy-network
 
 networks:
   cheffy-network:
