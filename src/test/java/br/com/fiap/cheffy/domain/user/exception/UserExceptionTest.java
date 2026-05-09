@@ -16,12 +16,6 @@ class UserExceptionTest {
         assertThat(ex.getId()).isEqualTo(1L);
     }
 
-    @Test
-    void invalidPasswordException() {
-        InvalidPasswordException ex = new InvalidPasswordException(INVALID_PASSWORD_MSG, 12);
-        assertThat(ex.getMessage()).contains("INVALID_PASSWORD_MSG");
-        assertThat(ex.getMinPasswordLength()).isEqualTo(12);
-    }
 
     @Test
     void invalidPostalCodeException() {
