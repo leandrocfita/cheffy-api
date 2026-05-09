@@ -31,7 +31,7 @@ public class AddressTestUtils {
                 "12345678",
                 "Test Hood",
                 "TS",
-                null,
+                "Ap 11",
                 true
         );
     }
