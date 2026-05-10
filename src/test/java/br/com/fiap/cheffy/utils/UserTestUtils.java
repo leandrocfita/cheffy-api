@@ -16,8 +16,12 @@ public class UserTestUtils {
         return User.create("teste", "email@teste.com", Profile.create(2L, ProfileType.OWNER.getType()));
     }
 
-    public static User createAFullUserEntity(){
+    public static User createAFullActiveUserEntity(){
         return new User(UUID.randomUUID(), "John", "john@email.com", "some-auth-id", true, AuthStatus.CONFIRMED);
+    }
+
+    public static User createAFullNonActiveUserEntity(){
+        return new User(UUID.randomUUID(), "John", "john@email.com", "some-auth-id", false, AuthStatus.CONFIRMED);
     }
 
 }

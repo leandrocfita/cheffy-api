@@ -8,7 +8,6 @@ import br.com.fiap.cheffy.domain.profile.exception.ProfileNotFoundException;
 import br.com.fiap.cheffy.domain.profile.port.output.ProfileRepository;
 import br.com.fiap.cheffy.domain.user.entity.Address;
 import br.com.fiap.cheffy.domain.user.entity.User;
-import br.com.fiap.cheffy.domain.user.port.input.PasswordEncoderPort;
 import br.com.fiap.cheffy.domain.user.port.output.AuthUserExternalClient;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
 import br.com.fiap.cheffy.shared.exception.RegisterFailedException;
@@ -23,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,7 +52,7 @@ class CreateUserUseCaseTest {
     void executeCreatesUserWithAddress() {
         UserCommandPort command = buildCommand();
         Profile profile = Profile.create(7L, ProfileType.CLIENT.name());
-        User savedUser =  UserTestUtils.createAFullUserEntity();
+        User savedUser =  UserTestUtils.createAFullActiveUserEntity();
         Address mainAddress = AddressTestUtils.createTestAddressDomainEntity();
 
         savedUser.addAddress(mainAddress);
@@ -100,7 +98,7 @@ class CreateUserUseCaseTest {
     void executeThrowsWhenEmailAlreadyExists() {
         UserCommandPort command = buildCommand();
         Profile profile = Profile.create(7L, ProfileType.CLIENT.name());
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         when(userRepository.findByEmail(command.email())).thenReturn(Optional.of(user));
 
         assertThrows(RegisterFailedException.class, () -> createUserUseCase.execute(command));
