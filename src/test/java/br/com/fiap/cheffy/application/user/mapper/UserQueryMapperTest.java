@@ -10,8 +10,6 @@ import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserQueryMapperTest {
@@ -27,7 +25,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapUserToQuery() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addProfile(Profile.create(1L, "CLIENT"));
         user.addAddress(new Address(1L, "Street", 123, "City", "12345678", "Neighborhood", "SP", null, true));
 
@@ -41,7 +39,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapMultipleProfiles() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addProfile(Profile.create(1L, "CLIENT"));
         user.addProfile(Profile.create(2L, "OWNER"));
 
@@ -52,7 +50,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapMultipleAddresses() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addAddress(new Address(1L, "Street 1", 123, "City", "12345678", "Neighborhood", "SP", null, true));
         user.addAddress(new Address(2L, "Street 2", 456, "City", "87654321", "Neighborhood", "RJ", null, false));
 
@@ -63,7 +61,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapAddressWithAllFields() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         Address address = new Address(1L, "Main St", 100, "São Paulo", "01000000", "Centro", "SP", "Apt 10", true);
         user.addAddress(address);
 
@@ -82,7 +80,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapUserWithNoAddresses() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addProfile(Profile.create(1L, "CLIENT"));
 
         UserQueryPort query = mapper.toQuery(user);
@@ -92,7 +90,7 @@ class UserQueryMapperTest {
 
     @Test
     void shouldMapUserWithNoProfiles() {
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
 
         UserQueryPort query = mapper.toQuery(user);
 

@@ -34,7 +34,7 @@ class AddAddressUseCaseTest {
     @Test
     void executeAddsAddressAndSavesUser() {
         UUID userId = UUID.randomUUID();
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         AddressCommandPort command = new AddressCommandPort(
                 "Main Street",
                 123,
@@ -68,7 +68,7 @@ class AddAddressUseCaseTest {
     @Test
     void executeReplacesExistingMainAddressWhenNewMainIsAdded() {
         UUID userId = UUID.randomUUID();
-        User user = UserTestUtils.createAFullUserEntity();
+        User user = UserTestUtils.createAFullActiveUserEntity();
         Address existing = Address.create(
                 "Old Street",
                 10,
