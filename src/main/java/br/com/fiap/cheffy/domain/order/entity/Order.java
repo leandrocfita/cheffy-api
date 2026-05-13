@@ -1,11 +1,14 @@
 package br.com.fiap.cheffy.domain.order.entity;
 
 import br.com.fiap.cheffy.domain.valueobject.Money;
+import br.com.fiap.cheffy.domain.order.exception.OrderOperationNotAllowedException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
+import static br.com.fiap.cheffy.shared.exception.keys.ExceptionsKeys.ORDER_CANNOT_BE_CONFIRMED;
 
 public class Order {
 
@@ -57,6 +60,9 @@ public class Order {
     }
 
     public void markPaymentPending() {
+        if (this.status != OrderStatus.CREATED) {
+            throw new OrderOperationNotAllowedException(ORDER_CANNOT_BE_CONFIRMED);
+        }
         this.status = OrderStatus.PAYMENT_PENDING;
     }
 

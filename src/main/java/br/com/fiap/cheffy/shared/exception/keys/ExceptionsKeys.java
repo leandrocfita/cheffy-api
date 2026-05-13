@@ -64,5 +64,6 @@ public enum ExceptionsKeys {
 
     //Order
     ORDER_NOT_FOUND_EXCEPTION,
+    ORDER_CANNOT_BE_CONFIRMED,
     FOOD_ITEM_UNAVAILABLE_FOR_ORDER
 }
