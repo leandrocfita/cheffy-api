@@ -85,7 +85,11 @@ public class OrderController implements OrderControllerDocs {
         CurrentUser currentUser = currentUserMapper.from(jwt);
         log.info("OrderController.confirmOrder - START - Confirm order [{}] for user [{}]", orderId, currentUser.id());
 
-        OrderQueryPort confirmedOrder = confirmOrderInput.execute(orderId, currentUser.id());
+        OrderQueryPort confirmedOrder = confirmOrderInput.execute(
+                orderId,
+                currentUser.id(),
+                "Bearer " + jwt.getTokenValue()
+        );
 
         log.info("OrderController.confirmOrder - END - Order [{}] confirmed", confirmedOrder.id());
 

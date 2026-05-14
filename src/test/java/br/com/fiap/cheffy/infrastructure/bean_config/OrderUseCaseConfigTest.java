@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.infrastructure.bean_config;
 
+import br.com.fiap.cheffy.application.order.dto.OrderConfirmationCommandPort;
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.order.usecase.ConfirmOrderUseCase;
@@ -11,6 +12,7 @@ import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.fooditem.port.output.FoodItemRepository;
 import br.com.fiap.cheffy.domain.order.entity.Order;
+import br.com.fiap.cheffy.domain.order.port.output.OrderConfirmationExternalClient;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import br.com.fiap.cheffy.domain.restaurant.entity.Restaurant;
 import br.com.fiap.cheffy.domain.restaurant.port.output.RestaurantRepository;
@@ -48,7 +50,11 @@ class OrderUseCaseConfigTest {
     void confirmOrderUseCaseCreatesBean() {
         OrderUseCaseConfig config = new OrderUseCaseConfig();
 
-        ConfirmOrderUseCase useCase = config.confirmOrderUseCase(new StubOrderRepository(), orderQueryMapper);
+        ConfirmOrderUseCase useCase = config.confirmOrderUseCase(
+                new StubOrderRepository(),
+                new StubOrderConfirmationExternalClient(),
+                orderQueryMapper
+        );
 
         assertThat(useCase).isNotNull();
     }
@@ -77,6 +83,13 @@ class OrderUseCaseConfigTest {
         @Override
         public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
             return PageResult.of(List.of(), pageRequest.page(), pageRequest.size(), 0);
+        }
+    }
+
+    private static class StubOrderConfirmationExternalClient implements OrderConfirmationExternalClient {
+
+        @Override
+        public void confirm(OrderConfirmationCommandPort command) {
         }
     }
 

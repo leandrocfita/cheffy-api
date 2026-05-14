@@ -31,6 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderControllerTest {
 
+    private static final String TOKEN_VALUE = "user-token";
+    private static final String AUTHORIZATION_HEADER = "Bearer " + TOKEN_VALUE;
+
     @Test
     void createOrderReturnsCreatedWithOrderIdAndTotalAmount() {
         InMemoryCreateOrderInput createOrderInput = new InMemoryCreateOrderInput();
@@ -112,6 +115,7 @@ class OrderControllerTest {
         assertThat(response.getBody().id()).isEqualTo(orderId);
         assertThat(response.getBody().status()).isEqualTo(OrderStatus.PAYMENT_PENDING);
         assertThat(confirmOrderInput.customerId).isEqualTo(userId);
+        assertThat(confirmOrderInput.authorizationHeader).isEqualTo(AUTHORIZATION_HEADER);
     }
 
     @Test
@@ -147,7 +151,7 @@ class OrderControllerTest {
 
     private static Jwt jwtFor(UUID userId) {
         return new Jwt(
-                "token",
+                TOKEN_VALUE,
                 Instant.now(),
                 Instant.now().plusSeconds(3600),
                 Map.of("alg", "none"),
@@ -172,10 +176,12 @@ class OrderControllerTest {
     private static class InMemoryConfirmOrderInput implements ConfirmOrderInput {
 
         private UUID customerId;
+        private String authorizationHeader;
 
         @Override
-        public OrderQueryPort execute(UUID orderId, UUID customerId) {
+        public OrderQueryPort execute(UUID orderId, UUID customerId, String authorizationHeader) {
             this.customerId = customerId;
+            this.authorizationHeader = authorizationHeader;
             return new OrderQueryPort(
                     orderId,
                     customerId,
