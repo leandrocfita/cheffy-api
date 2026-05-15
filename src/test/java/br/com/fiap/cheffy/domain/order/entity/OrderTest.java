@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.domain.order.entity;
 
+import br.com.fiap.cheffy.domain.order.exception.OrderOperationNotAllowedException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -39,5 +40,14 @@ class OrderTest {
 
         order.markAsPaid();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID);
+    }
+
+    @Test
+    void markPaymentPendingThrowsWhenOrderIsAlreadyPaymentPending() {
+        OrderItem item = OrderItem.create(UUID.randomUUID(), "Burger", 1, new BigDecimal("15.00"));
+        Order order = Order.create(UUID.randomUUID(), UUID.randomUUID(), List.of(item));
+        order.markPaymentPending();
+
+        assertThrows(OrderOperationNotAllowedException.class, order::markPaymentPending);
     }
 }

@@ -13,6 +13,7 @@ import br.com.fiap.cheffy.domain.restaurant.exception.RestaurantNotFoundExceptio
 import br.com.fiap.cheffy.domain.restaurant.exception.RestaurantOperationNotAllowedException;
 import br.com.fiap.cheffy.domain.restaurant.exception.RestaurantDoesNotExistException;
 import br.com.fiap.cheffy.domain.user.exception.*;
+import br.com.fiap.cheffy.infrastructure.exception.ClientUnavailableException;
 import br.com.fiap.cheffy.infrastructure.exception.TokenExpiredException;
 import br.com.fiap.cheffy.presentation.exception.ApiInternalServerErrorException;
 import br.com.fiap.cheffy.presentation.exception.DeserializationException;
@@ -59,6 +60,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String INVALID_FORMAT_ERROR = ExceptionsKeys.INVALID_FORMAT_ERROR.toString();
     private static final String PROPERTY_BINDING_ERROR = ExceptionsKeys.PROPERTY_BINDING_ERROR.toString();
     private static final String PROFILE_ALREADY_EXIST = ExceptionsKeys.PROFILE_ALREADY_EXIST_EXCEPTION.toString();
+    private static final String CLIENT_UNAVAILABLE = ExceptionsKeys.CLIENT_UNAVAILABLE_EXCEPTION.toString();
 
     static class ApiExceptionHandlerService {
 
@@ -507,6 +509,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 title,
                 message)
                 .userMessage(message)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), httpStatusCode, request);
+    }
+
+    @ExceptionHandler(ClientUnavailableException.class)
+    public ResponseEntity<Object> handleClientUnavailableException(ClientUnavailableException ex, WebRequest request) {
+        String detail = getMessage(CLIENT_UNAVAILABLE);
+        HttpStatus httpStatusCode = HttpStatus.SERVICE_UNAVAILABLE;
+
+        Problem problem = createProblemBuilder(
+                httpStatusCode,
+                getExceptionName(ex),
+                detail)
+                .userMessage(detail)
                 .build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), httpStatusCode, request);
