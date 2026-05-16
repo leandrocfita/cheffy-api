@@ -45,28 +45,32 @@ public class ProfileController implements ProfileControllerDocs {
     @Override
     @PostMapping("")
     public ResponseEntity<ProfileCreateReponseDto> createProfile(@RequestBody @Valid ProfileInputDto profileInputDto) {
-
+        log.info("HTTP request received to create profile");
         ProfileInputPort profileInputPort = ProfileWebMapper.toProfileInputCommandPort(profileInputDto);
         Long id = profileCreateInput.create(profileInputPort);
-
-        ProfileCreateReponseDto profileCreateReponseDto = new ProfileCreateReponseDto(id, profileInputDto.profileNameType(), "Profile created successfully");
-
+        ProfileCreateReponseDto profileCreateReponseDto =
+                new ProfileCreateReponseDto(id, profileInputDto.profileNameType(), "Profile created successfully");
+        log.info("Profile created successfully [profileId={}]", profileCreateReponseDto.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(profileCreateReponseDto);
     }
 
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateProfileById(@PathVariable Long id, @RequestBody @Valid ProfileInputDto profileInputDto) {
+        log.info("HTTP request received to update profile [profileId={}]", id);
         ProfileInputPort profileInputPort = ProfileWebMapper.toProfileInputCommandPort(profileInputDto);
         profileUpdateInput.updateById(id, profileInputPort);
+        log.info("Profile updated successfully [profileId={}]", id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @PutMapping("/name/{name}")
     public ResponseEntity<Void> updateProfileByName(@PathVariable String name, @RequestBody @Valid ProfileInputDto profileInputDto) {
+        log.info("HTTP request received to update profile by name [name={}]", name);
         ProfileInputPort profileInputPort = ProfileWebMapper.toProfileInputCommandPort(profileInputDto);
         profileUpdateInput.updateByName(name, profileInputPort);
+        log.info("Profile updated successfully [name={}]", name);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,9 +78,9 @@ public class ProfileController implements ProfileControllerDocs {
     @GetMapping("/{id}")
     public ResponseEntity<ProfileQueryPort> findProfileById(@PathVariable Long id) {
         try {
-            log.info("ProfileController.findProfileById - START - Finding profile by ID [{}]", id);
+            log.info("HTTP request received to find profile by id [profileId={}]", id);
             var profile = findProfileByIdInput.execute(id);
-            log.info("ProfileController.findProfileById - END - Profile found: [{}]", profile);
+            log.info("Profile found successfully [profileId={}]", id);
             return ResponseEntity.ok(profile);
         } finally {
             MDC.clear();
@@ -90,18 +94,13 @@ public class ProfileController implements ProfileControllerDocs {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "type") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
-        log.info("ProfileController.listAllProfiles - START - Listing profiles [page={}, size={}, sortBy={}, direction={}]", page, size, sortBy, direction);
-
+        log.info("HTTP request received to list all profiles [page={}, size={}, sortBy={}, direction={}]", page, size, sortBy, direction);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
-
         PageRequest pageRequest = PageRequest.of(page, size, sortBy, sortDirection);
-
         PageResult<ProfileQueryPort> profiles = listAllProfilesInput.execute(pageRequest);
-
-        log.info("ProfileController.listAllProfiles - END - Found [{}] profiles in page [{}]", profiles.numberOfElements(), page);
-
+        log.info("Profiles found successfully, [{}] profiles were found on page [{}]", profiles.numberOfElements(), page);
         return ResponseEntity.ok(profiles);
     }
 
@@ -109,9 +108,9 @@ public class ProfileController implements ProfileControllerDocs {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
         try {
-            log.info("ProfileController.deleteProfile - START - Deleting profile with ID [{}]", id);
+            log.info("HTTP request received to delete profile [profileId={}]", id);
             profileDeleteInput.execute(id);
-            log.info("ProfileController.deleteProfile - END - Profile with ID [{}] deleted successfully", id);
+            log.info("Profile deleted successfully [profileId={}]", id);
             return ResponseEntity.noContent().build();
         } finally {
             MDC.clear();
