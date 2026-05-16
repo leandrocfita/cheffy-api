@@ -2,12 +2,9 @@ package br.com.fiap.cheffy.presentation.controller;
 
 import br.com.fiap.cheffy.application.restaurant.dto.RestaurantQueryPort;
 import br.com.fiap.cheffy.domain.restaurant.port.input.*;
-import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultApiErrors;
-import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultNotFoundApiResponse;
 import br.com.fiap.cheffy.presentation.config.swagger.docs.RestaurantControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.RestaurantCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.RestaurantUpdateDTO;
-import br.com.fiap.cheffy.presentation.exceptionhandler.model.Problem;
 import br.com.fiap.cheffy.presentation.mapper.RestaurantWebMapper;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
