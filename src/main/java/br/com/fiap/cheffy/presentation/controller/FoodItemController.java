@@ -5,13 +5,7 @@ import br.com.fiap.cheffy.application.fooditem.dto.FoodItemQueryPort;
 import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
-import br.com.fiap.cheffy.domain.fooditem.port.input.CreateFoodItemInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.UpdateFoodItemInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.FindFoodItemByIdInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.ListFoodItemsByRestaurantInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.DeactivateFoodItemInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.ReactivateFoodItemInput;
-import br.com.fiap.cheffy.domain.fooditem.port.input.UpdateFoodItemAvailabilityInput;
+import br.com.fiap.cheffy.domain.fooditem.port.input.*;
 import br.com.fiap.cheffy.presentation.config.swagger.docs.FoodItemControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.FoodItemAvailabilityDTO;
 import br.com.fiap.cheffy.presentation.dto.FoodItemDTO;
@@ -21,7 +15,6 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,35 +63,29 @@ public class FoodItemController implements FoodItemControllerDocs {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "false") boolean includeInactive) {
-
-        log.info("FoodItemController.listFoodItemsByRestaurant - START - restaurantId=[{}], page={}, size={}, includeInactive={}", restaurantId, page, size, includeInactive);
-
+        log.info("HTTP request received to list food items for restaurant [restaurantId={}, page={}, size={}, includeInactive={}]", restaurantId, page, size, includeInactive);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
-
         PageResult<FoodItemQueryPort> result = listFoodItemsByRestaurantInput.execute(restaurantId, PageRequest.of(page, size, sortBy, sortDirection), includeInactive);
-
-        log.info("FoodItemController.listFoodItemsByRestaurant - END - Found [{}] items", result.numberOfElements());
-
+        log.info("Listing food items for restaurant [{}] with pagination [page={}, size={}, sortBy={}, direction={}] and includeInactive=[{}]", restaurantId, page, size, sortBy, direction, includeInactive);
         return ResponseEntity.ok(result);
     }
 
     @Override
     @PostMapping()
     @Transactional
-    public ResponseEntity<FoodItemQueryPort> postFoodItem(
+    public ResponseEntity<FoodItemQueryPort> createFoodItem(
             @RequestBody @Valid FoodItemDTO foodItemDTO,
-            @PathVariable @Valid UUID restaurantId){
-
+            @PathVariable @Valid UUID restaurantId) {
+        log.info("Creating food item [foodName={}, restaurantId={}]", foodItemDTO.name(), restaurantId);
         FoodItemCommandPort foodItemCommandPort = foodItemWebMapper.foodItemDtoToFoodItemCommandPort(foodItemDTO, restaurantId);
-
         FoodItem createdFoodItem = createFoodItemInput.execute(foodItemCommandPort);
-
         FoodItemQueryPort responseObject = foodItemWebMapper.foodItemToFoodItemQueryPort(createdFoodItem);
-
+        log.info("Food item created successfully [foodItemId={}, foodName={}, restaurantId={}]", createdFoodItem.getId(), createdFoodItem.getName(), restaurantId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseObject);
     }
+
     @Override
     @Transactional
     @PatchMapping("/{foodItemId}")
@@ -107,11 +94,11 @@ public class FoodItemController implements FoodItemControllerDocs {
             @PathVariable @Valid UUID restaurantId,
             @RequestAttribute("userId") UUID userId,
             @PathVariable @Valid UUID foodItemId
-    ){
+    ) {
+        log.info("Updating food item [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, userId);
         FoodItemCommandPort foodItemCommandPort = foodItemWebMapper.foodItemDtoToFoodItemCommandPort(foodItemUpdateDTO, restaurantId);
-
         updateFoodItemInput.update(foodItemId, restaurantId, userId, foodItemCommandPort);
-
+        log.info("Food item updated successfully [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -119,14 +106,10 @@ public class FoodItemController implements FoodItemControllerDocs {
     @Override
     @Transactional(readOnly = true)
     @GetMapping("/{foodItemId}")
-    public ResponseEntity<FoodItemQueryPort> getFoodItemById(@PathVariable UUID restaurantId, @PathVariable UUID foodItemId) {
-
-
-        log.info("FoodItemController.getFoodItemById - START - Finding food item [{}] for restaurant [{}]", foodItemId, restaurantId);
-
+    public ResponseEntity<FoodItemQueryPort> findFoodItemById(@PathVariable UUID restaurantId, @PathVariable UUID foodItemId) {
+        log.info("Finding food item [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         FoodItemQueryPort foodItemQueryPort = findFoodItemByIdInput.execute(restaurantId, foodItemId);
-
-        log.info("FoodItemController.getFoodItemById - END - Food item found [{}]", foodItemId);
+        log.info("Food item found by id [foodItemId={}]", foodItemId);
         return ResponseEntity.ok(foodItemQueryPort);
     }
 
@@ -135,9 +118,9 @@ public class FoodItemController implements FoodItemControllerDocs {
     public ResponseEntity<Void> deactivateFoodItem(
             @PathVariable UUID restaurantId,
             @PathVariable UUID foodItemId) {
-        log.info("FoodItemController.deactivateFoodItem - START - restaurantId: [{}], foodItemId: [{}]", restaurantId, foodItemId);
+        log.info("HTTP request received to deactivate food item by restaurant [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         deactivateFoodItemInput.execute(restaurantId, foodItemId);
-        log.info("FoodItemController.deactivateFoodItem - END - foodItemId: [{}]", foodItemId);
+        log.info("Food item deactivated successfully [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         return ResponseEntity.noContent().build();
     }
 
@@ -146,9 +129,9 @@ public class FoodItemController implements FoodItemControllerDocs {
     public ResponseEntity<Void> reactivateFoodItem(
             @PathVariable UUID restaurantId,
             @PathVariable UUID foodItemId) {
-        log.info("FoodItemController.reactivateFoodItem - START - restaurantId: [{}], foodItemId: [{}]", restaurantId, foodItemId);
+        log.info("HTTP request received to reactivate food item by restaurant [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         reactivateFoodItemInput.execute(restaurantId, foodItemId);
-        log.info("FoodItemController.reactivateFoodItem - END - foodItemId: [{}]", foodItemId);
+        log.info("Food item reactivated successfully [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         return ResponseEntity.noContent().build();
     }
 
@@ -158,9 +141,9 @@ public class FoodItemController implements FoodItemControllerDocs {
             @PathVariable UUID restaurantId,
             @PathVariable UUID foodItemId,
             @RequestBody @Valid FoodItemAvailabilityDTO dto) {
-        log.info("FoodItemController.updateFoodItemAvailability - START - restaurantId: [{}], foodItemId: [{}]", restaurantId, foodItemId);
+        log.info("HTTP request received to update food item availability [foodItemId={}, restaurantId={}, available={}]", foodItemId, restaurantId, dto.available());
         updateFoodItemAvailabilityInput.execute(restaurantId, foodItemId, foodItemWebMapper.toAvailabilityCommand(dto));
-        log.info("FoodItemController.updateFoodItemAvailability - END - foodItemId: [{}]", foodItemId);
+        log.info("Food item availability updated successfully [foodItemId={}, restaurantId={}, available={}]", foodItemId, restaurantId, dto.available());
         return ResponseEntity.noContent().build();
     }
 }
