@@ -157,9 +157,6 @@ public class UserController implements UserControllerDocs {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
-
-        log.info("UserController.listAllUsers - START - Listing users [page={}, size={}, sortBy={}, direction={}]",
-                page, size, sortBy, direction);
         log.info("HTTP request received to search all users [page={}, size={}, sortBy={}, direction={}]", page, size, sortBy, direction);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
