@@ -34,21 +34,18 @@ public class FoodItemRepositoryImpl implements FoodItemRepository {
 
     @Override
     public FoodItem save(FoodItem foodItem) {
-
+        log.info("Saving food item [foodItemName={}, restaurantName={}]", foodItem.getName(), foodItem.getRestaurant().getName());
         RestaurantJpaEntity restaurantJpaEntity = restaurantPersistenceMapper.toJpa(foodItem.getRestaurant());
-
-        FoodItemJpaEntity transformedObject = foodItemPersistenceMapper.toJpa(foodItem,  restaurantJpaEntity);
-
-         var savedEntity = foodItemJpaRepository.save(transformedObject);
-
+        FoodItemJpaEntity transformedObject = foodItemPersistenceMapper.toJpa(foodItem, restaurantJpaEntity);
+        var savedEntity = foodItemJpaRepository.save(transformedObject);
         FoodItem saved = foodItemPersistenceMapper.toDomain(savedEntity);
         saved.setRestaurant(foodItem.getRestaurant());
-
         return saved;
     }
 
     @Override
     public Optional<FoodItem> findById(UUID foodItemId) {
+        log.info("Finding food item by id [foodItemId={}]", foodItemId);
         return foodItemJpaRepository.findById(foodItemId)
                 .map(this::mapToDomainWithRestaurant);
     }
@@ -56,6 +53,7 @@ public class FoodItemRepositoryImpl implements FoodItemRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<FoodItem> findByIdAndRestaurantId(UUID foodItemId, UUID restaurantId) {
+        log.info("Finding food item by id and restaurant id [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         return foodItemJpaRepository.findByIdAndRestaurantId(foodItemId, restaurantId)
                 .map(entity -> {
                     FoodItem foodItem = foodItemPersistenceMapper.toDomain(entity);
@@ -80,6 +78,7 @@ public class FoodItemRepositoryImpl implements FoodItemRepository {
 
     @Override
     public PageResult<FoodItem> findAllByRestaurantId(UUID restaurantId, PageRequest pageRequest) {
+        log.info("Finding all food items by restaurant id [restaurantId={}, pageNumber={}, pageSize={}]", restaurantId, pageRequest.page(), pageRequest.size());
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<FoodItemJpaEntity> springPage = foodItemJpaRepository.findAllByRestaurantId(restaurantId, springPageable);
         Page<FoodItem> domainPage = springPage.map(foodItemPersistenceMapper::toDomain);
@@ -88,6 +87,7 @@ public class FoodItemRepositoryImpl implements FoodItemRepository {
 
     @Override
     public PageResult<FoodItem> findAllActiveByRestaurantId(UUID restaurantId, PageRequest pageRequest) {
+        log.info("Finding all active food items by restaurant id [restaurantId={}, pageNumber={}, pageSize={}]", restaurantId, pageRequest.page(), pageRequest.size());
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<FoodItemJpaEntity> springPage = foodItemJpaRepository.findAllActiveByRestaurantId(restaurantId, springPageable);
         Page<FoodItem> domainPage = springPage.map(foodItemPersistenceMapper::toDomain);
@@ -96,11 +96,13 @@ public class FoodItemRepositoryImpl implements FoodItemRepository {
 
     @Override
     public boolean existsInRestaurantById(UUID restaurantId, UUID foodItemId) {
+        log.info("Checking if food item exists in restaurant by id [foodItemId={}, restaurantId={}]", foodItemId, restaurantId);
         return foodItemJpaRepository.existsInRestaurantById(restaurantId, foodItemId);
     }
 
     @Override
     public boolean existsByNameIgnoreCaseAndRestaurantId(String foodName, UUID restaurantId) {
+        log.info("Checking if food item exists by name ignoring case and restaurant id [foodName={}, restaurantId={}]", foodName, restaurantId);
         return foodItemJpaRepository.existsByNameIgnoreCaseAndRestaurantId(foodName, restaurantId);
     }
 }
