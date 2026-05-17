@@ -24,7 +24,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     @Override
     @Transactional
     public Restaurant save(Restaurant restaurant) {
-        log.info("Saving restaurant {}", restaurant.getName());
+        log.debug("Saving restaurant {}", restaurant.getName());
         RestaurantJpaEntity restaurantJpaEntity = restaurantMapper.toJpa(restaurant);
         RestaurantJpaEntity saved = restaurantJpaRepository.save(restaurantJpaEntity);
         return restaurantMapper.toDomain(saved);
@@ -32,26 +32,26 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public boolean existsByCnpj(String cnpj) {
-        log.info("Checking if restaurant exists by cnpj {}", cnpj);
+        log.debug("Checking if restaurant exists by cnpj {}", cnpj);
         return restaurantJpaRepository.existsByCnpj(cnpj);
     }
 
     @Override
     public boolean existsByName(String restaurantName) {
-        log.info("Checking if restaurant exists by name {}", restaurantName);
+        log.debug("Checking if restaurant exists by name {}", restaurantName);
         return restaurantJpaRepository.existsByName(restaurantName);
     }
 
     @Override
     public boolean existsActiveRestaurantByUserId(UUID userId) {
-        log.info("Checking if restaurant exists by userId {}", userId);
+        log.debug("Checking if restaurant exists by userId {}", userId);
         return restaurantJpaRepository.existsByUserIdAndActiveTrue(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Restaurant> findById(UUID restaurantId) {
-        log.info("Finding restaurant by id {}", restaurantId);
+        log.debug("Finding restaurant by id {}", restaurantId);
         return restaurantJpaRepository.findById(restaurantId)
                 .map(restaurantMapper::toDomain);
     }

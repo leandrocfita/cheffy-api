@@ -27,21 +27,21 @@ public class ProfileRepositoryImpl implements ProfileRepository {
 
     @Override
     public Optional<Profile> findById(Long id) {
-        log.info("Finding profile by id {}", id);
+        log.debug("Finding profile by id {}", id);
         return profileJpaRepository.findById(id)
                 .map(mapper::toDomain);
     }
 
     @Override
     public Optional<Profile> findByType(String type) {
-        log.info("Finding profile by type {}", type);
+        log.debug("Finding profile by type {}", type);
         return profileJpaRepository.findByType(type)
                 .map(mapper::toDomain);
     }
 
     @Override
     public Long save(Profile profileDomain) {
-        log.info("Saving profile {}", profileDomain.getType());
+        log.debug("Saving profile {}", profileDomain.getType());
         ProfileJpaEntity profileJpa = mapper.toJpaReference(profileDomain);
         return profileJpaRepository.save(profileJpa).getId();
     }
@@ -49,7 +49,7 @@ public class ProfileRepositoryImpl implements ProfileRepository {
     @Override
     @Transactional(readOnly = true)
     public PageResult<Profile> findAll(PageRequest pageRequest) {
-        log.info("Finding all profiles with page request {}", pageRequest);
+        log.debug("Finding all profiles with page request {}", pageRequest);
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<ProfileJpaEntity> springPage = profileJpaRepository.findAll(springPageable);
         Page<Profile> domainPage = springPage.map(mapper::toDomain);
@@ -59,7 +59,7 @@ public class ProfileRepositoryImpl implements ProfileRepository {
 
     @Override
     public void delete(Profile profileDomain) {
-        log.info("Deleting profile {}", profileDomain.getType());
+        log.debug("Deleting profile {}", profileDomain.getType());
         ProfileJpaEntity profileJpa = mapper.toJpaReference(profileDomain);
         profileJpaRepository.delete(profileJpa);
     }
