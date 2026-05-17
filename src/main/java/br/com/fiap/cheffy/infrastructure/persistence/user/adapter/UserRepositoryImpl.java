@@ -27,7 +27,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) {
-        log.info("Saving user with email: {}", user.getEmail());
+        log.debug("Saving user with email: {}", user.getEmail());
         var jpaEntity = mapper.toJpa(user);
         UserJpaEntity saved = userJpaRepository.save(jpaEntity);
         return mapper.toDomain(saved);
@@ -35,21 +35,21 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        log.info("Finding user by email: {}", email);
+        log.debug("Finding user by email: {}", email);
         return userJpaRepository.findByEmail(email)
                 .map(mapper::toDomain);
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        log.info("Finding user by id: {}", id);
+        log.debug("Finding user by id: {}", id);
         return userJpaRepository.findById(id)
                 .map(mapper::toDomain);
     }
 
     @Override
     public PageResult<User> findAll(PageRequest pageRequest) {
-        log.info("Finding users by page request: {}", pageRequest);
+        log.debug("Finding users by page request: {}", pageRequest);
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<UserJpaEntity> springPage = userJpaRepository.findAll(springPageable);
         Page<User> domainPage = springPage.map(mapper::toDomain);
@@ -58,7 +58,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public PageResult<User> findByName(String name, PageRequest pageRequest) {
-        log.info("Finding users by name request: {}", pageRequest);
+        log.debug("Finding users by name request: {}", pageRequest);
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<UserJpaEntity> springPage = userJpaRepository.findByNameContainingIgnoreCase(name, springPageable);
         Page<User> domainPage = springPage.map(mapper::toDomain);

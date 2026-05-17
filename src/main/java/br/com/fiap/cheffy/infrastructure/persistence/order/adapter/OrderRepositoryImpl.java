@@ -35,6 +35,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Order save(Order order) {
+        log.debug("Saving order: {}", order);
         return orderPersistenceMapper.toDomain(
                 orderJpaRepository.save(orderPersistenceMapper.toJpa(order))
         );
@@ -42,14 +43,14 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Optional<Order> findById(UUID id) {
-        log.info("Finding order by id " + id);
+        log.debug("Finding order by id {}", id);
         return orderJpaRepository.findByIdWithItems(id)
                 .map(orderPersistenceMapper::toDomain);
     }
 
     @Override
     public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
-        log.info("Finding all orders by customer id {} with page request {}", customerId, pageRequest);
+        log.debug("Finding all orders by customer id {} with page request {}", customerId, pageRequest);
         Sort sort = pageRequest.direction() == PageRequest.SortDirection.DESC
                 ? Sort.by(pageRequest.sortBy()).descending()
                 : Sort.by(pageRequest.sortBy()).ascending();
