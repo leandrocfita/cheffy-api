@@ -68,7 +68,7 @@ public class FoodItemController implements FoodItemControllerDocs {
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
         PageResult<FoodItemQueryPort> result = listFoodItemsByRestaurantInput.execute(restaurantId, PageRequest.of(page, size, sortBy, sortDirection), includeInactive);
-        log.info("Listing food items for restaurant [{}] with pagination [page={}, size={}, sortBy={}, direction={}] and includeInactive=[{}]", restaurantId, page, size, sortBy, direction, includeInactive);
+        log.info("Food items found successfully [restaurantId={}, page={}, size={}, sortBy={}, direction={}, includeInactive={}]", restaurantId, page, size, sortBy, direction, includeInactive);
         return ResponseEntity.ok(result);
     }
 
