@@ -1,14 +1,13 @@
 package br.com.fiap.cheffy.infrastructure.persistence.user.adapter;
 
-import br.com.fiap.cheffy.infrastructure.persistence.pagination.PageMapper;
 import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
+import br.com.fiap.cheffy.infrastructure.persistence.pagination.PageMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.user.entity.UserJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.mapper.UserPersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.user.repository.UserJpaRepository;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
