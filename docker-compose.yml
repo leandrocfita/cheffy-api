@@ -22,7 +22,7 @@ services:
       context: .
       args:
         # Passa o valor para o Dockerfile. O nome do host é 'postgres' (o nome do serviço)
-        DB_HOST_ARG: $DB_HOSTd
+        DB_HOST_ARG: $DB_HOST
         POSTGRES_PASSWORD_ARG: $POSTGRES_PASSWORD
         DB_PORT_ARG: $DB_PORT
     ports:
@@ -110,6 +110,16 @@ services:
       - cheffy-network
     depends_on:
       - kafka
+
+  order-service:
+    image: rodfc773/order-service
+    container_name: order-service
+    networks:
+      - cheffy-network
+    depends_on:
+      - mongoDb
+    ports:
+      - "8083:8083"
 
 networks:
   cheffy-network:
