@@ -128,6 +128,15 @@ services:
     ports:
       - "8083:8083"
 
+  procpag:
+    image: docker.io/erickemprobr/procpag:latest
+    platform: linux/amd64
+    ports:
+      - "8089:8089"
+
+    networks:
+      - cheffy-network
+
 networks:
   cheffy-network:
     driver: bridge
