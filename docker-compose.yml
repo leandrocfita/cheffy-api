@@ -128,6 +128,16 @@ services:
     ports:
       - "8083:8083"
 
+  order-service:
+    image: rodfc773/order-service
+    container_name: order-service
+    networks:
+      - cheffy-network
+    depends_on:
+      - mongoDb
+    ports:
+      - "8083:8083"
+
 networks:
   cheffy-network:
     driver: bridge
