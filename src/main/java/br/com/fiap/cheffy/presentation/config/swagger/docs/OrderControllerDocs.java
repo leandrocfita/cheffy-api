@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
@@ -57,7 +59,20 @@ public interface OrderControllerDocs {
                     )
             )
     )
-    ResponseEntity<CreateOrderResultPort> createOrder(@Valid OrderCreateDTO orderCreateDTO, UUID userId);
+    ResponseEntity<CreateOrderResultPort> createOrder(@Valid OrderCreateDTO orderCreateDTO, @AuthenticationPrincipal Jwt jwt);
+
+    @Operation(summary = "Confirmar pedido", description = "Confirma o pedido do cliente autenticado e altera seu status para aguardando pagamento")
+    @ApiResponse(
+            responseCode = "200",
+            description = "Pedido confirmado com sucesso",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = OrderQueryPort.class)
+            )
+    )
+    @DefaultNotFoundApiResponse
+    @DefaultApiErrors
+    ResponseEntity<OrderQueryPort> confirmOrder(UUID orderId, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Consultar pedido por ID", description = "Retorna um pedido associado ao cliente autenticado")
     @ApiResponse(
@@ -70,7 +85,7 @@ public interface OrderControllerDocs {
     )
     @DefaultNotFoundApiResponse
     @DefaultApiErrors
-    ResponseEntity<OrderQueryPort> findById(UUID orderId, UUID userId);
+    ResponseEntity<OrderQueryPort> findById(UUID orderId, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Listar pedidos do cliente autenticado", description = "Retorna lista paginada dos pedidos associados ao cliente autenticado")
     @ApiResponse(
@@ -79,5 +94,5 @@ public interface OrderControllerDocs {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
     )
     @DefaultApiErrors
-    ResponseEntity<PageResult<OrderQueryPort>> listByCustomer(UUID userId, int page, int size, String sortBy, Sort.Direction direction);
+    ResponseEntity<PageResult<OrderQueryPort>> listByCustomer(@AuthenticationPrincipal Jwt jwt, int page, int size, String sortBy, Sort.Direction direction);
 }
