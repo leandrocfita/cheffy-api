@@ -1,4 +1,5 @@
 #!/bin/sh
+# Normalized line endings to LF
 set -e
 
 # The 'psql' command is available because this script runs inside the postgres container.

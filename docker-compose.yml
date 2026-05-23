@@ -98,6 +98,23 @@ services:
     networks:
       - cheffy-network
 
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_MONGODB_SERVER=mongoDb  # Deve ser exatamente o nome do seu serviço do Mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    networks:
+      - cheffy-network
+    depends_on:
+      - mongoDb
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -114,7 +131,7 @@ services:
     image: docker.io/erickemprobr/procpag:latest
     platform: linux/amd64
     ports:
-      - "8065:8065"
+      - "8089:8089"
     networks:
       - cheffy-network
 
