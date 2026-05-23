@@ -3,6 +3,7 @@ package br.com.fiap.cheffy.infrastructure.kafka.config;
 import br.com.fiap.cheffy.infrastructure.kafka.dto.OrderStatusUpdatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,9 +20,16 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
     @Bean
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-service-group");
         return props;
     }
@@ -30,7 +38,8 @@ public class KafkaConfig {
     public ConsumerFactory<String, OrderStatusUpdatedEvent> consumerFactory() {
         JsonDeserializer<OrderStatusUpdatedEvent> deserializer =
                 new JsonDeserializer<>(OrderStatusUpdatedEvent.class);
-        deserializer.addTrustedPackages("*");
+        deserializer.addTrustedPackages("br.com.fiap.cheffy.infrastructure.kafka.dto");
+        deserializer.setUseTypeHeaders(false);
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), deserializer);
     }
 
