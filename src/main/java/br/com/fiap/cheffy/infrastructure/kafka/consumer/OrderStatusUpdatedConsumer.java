@@ -17,7 +17,10 @@ public class OrderStatusUpdatedConsumer {
 
     private final UpdateOrderStatusUseCase updateOrderStatusUseCase;
 
-    @KafkaListener(topics = "order.status-changes", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(
+            topics = "${order.events.status-changes-topic:order.status-changes}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
     public void consumer(OrderStatusUpdatedEvent event, Acknowledgment ack) {
         try {
             log.info("Message received: [orderId={}, status={}]", event.orderId(), event.status());
