@@ -2,10 +2,7 @@ package br.com.fiap.cheffy.infrastructure.bean_config;
 
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
-import br.com.fiap.cheffy.application.order.usecase.ConfirmOrderUseCase;
-import br.com.fiap.cheffy.application.order.usecase.CreateOrderUseCase;
-import br.com.fiap.cheffy.application.order.usecase.FindOrderByIdUseCase;
-import br.com.fiap.cheffy.application.order.usecase.ListOrdersByCustomerUseCase;
+import br.com.fiap.cheffy.application.order.usecase.*;
 import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import org.springframework.context.annotation.Bean;
@@ -45,5 +42,10 @@ public class OrderUseCaseConfig {
             OrderQueryMapper orderQueryMapper
     ) {
         return new ListOrdersByCustomerUseCase(orderRepository, orderQueryMapper);
+    }
+
+    @Bean
+    public UpdateOrderStatusUseCase updateOrderStatusUseCase(OrderRepository orderRepository) {
+        return new UpdateOrderStatusUseCase(orderRepository);
     }
 }
