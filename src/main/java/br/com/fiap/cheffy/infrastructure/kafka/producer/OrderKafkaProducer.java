@@ -1,4 +1,4 @@
-package br.com.fiap.cheffy.infrastructure.messaging.order;
+package br.com.fiap.cheffy.infrastructure.kafka.producer;
 
 import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
 import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
