@@ -2,12 +2,9 @@ package br.com.fiap.cheffy.presentation.controller;
 
 import br.com.fiap.cheffy.application.restaurant.dto.RestaurantQueryPort;
 import br.com.fiap.cheffy.domain.restaurant.port.input.*;
-import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultApiErrors;
-import br.com.fiap.cheffy.presentation.config.doc_helper.DefaultNotFoundApiResponse;
 import br.com.fiap.cheffy.presentation.config.swagger.docs.RestaurantControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.RestaurantCreateDTO;
 import br.com.fiap.cheffy.presentation.dto.RestaurantUpdateDTO;
-import br.com.fiap.cheffy.presentation.exceptionhandler.model.Problem;
 import br.com.fiap.cheffy.presentation.mapper.RestaurantWebMapper;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -52,24 +49,21 @@ public class RestaurantController implements RestaurantControllerDocs {
     public ResponseEntity<String> registerRestaurant(
             @RequestBody @Valid final RestaurantCreateDTO restaurantCreateDTO,
             @PathVariable @Valid final UUID userId
-            ) {
-        log.info("RestaurantController.createRestaurant - START - Create restaurante- user [{}]", userId);
-
-        var createdId = restaurantInput.execute(mapper.toCommand(restaurantCreateDTO), userId);
-
-        log.info("RestaurantController.createRestaurant - END - Restaurant created with id [{}]", createdId);
-
+    ) {
+        log.info("HTTP request received to create a restaurant");
+        var restaurantId = restaurantInput.execute(mapper.toCommand(restaurantCreateDTO), userId);
+        log.info("Restaurant created successfully [restaurantId={}]", restaurantId);
         MDC.clear();
-        return new ResponseEntity<>(createdId, HttpStatus.CREATED);
+        return new ResponseEntity<>(restaurantId, HttpStatus.CREATED);
     }
 
     @Override
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateRestaurant(@PathVariable @Valid final UUID id,
                                                      @RequestParam @Valid final UUID userId) {
-        log.info("RestaurantController.deactivateRestaurant - START - Deactivate restaurant - id: [{}], userId: [{}]", id, userId);
+        log.info("HTTP request received to deactivate restaurant [restaurantId={}, userId={}]", id, userId);
         deactivateRestaurantInput.execute(id, userId);
-        log.info("RestaurantController.deactivateRestaurant - END - Restaurant deactivated - id: [{}]", id);
+        log.info("Restaurant deactivated successfully [restaurantId={}, userId={}]", id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -77,9 +71,9 @@ public class RestaurantController implements RestaurantControllerDocs {
     @PatchMapping("/{id}/reactivate")
     public ResponseEntity<Void> reactivateRestaurant(@PathVariable @Valid final UUID id,
                                                      @RequestParam @Valid final UUID userId) {
-        log.info("RestaurantController.reactivateRestaurant - START - Reactivate restaurant - id: [{}], userId: [{}]", id, userId);
+        log.info("HTTP request received to reactivate restaurant [restaurantId={}, userId={}]", id, userId);
         reactivateRestaurantInput.execute(id, userId);
-        log.info("RestaurantController.reactivateRestaurant - END - Restaurant reactivated - id: [{}]", id);
+        log.info("Restaurant successfully reactivated [restaurantId={}, userId={}]", id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -90,9 +84,9 @@ public class RestaurantController implements RestaurantControllerDocs {
             @RequestParam final UUID userId,
             @RequestBody @Valid final RestaurantUpdateDTO restaurantUpdateDTO
     ) {
-        log.info("RestaurantController.updateRestaurant - START - Update restaurant - id: [{}], userId: [{}]", id, userId);
+        log.info("HTTP request received to update restaurant [restaurantId={}, userId={}]", id, userId);
         updateRestaurantInput.execute(id, userId, mapper.toUpdateCommand(restaurantUpdateDTO));
-        log.info("RestaurantController.updateRestaurant - END - Restaurant updated - id: [{}]", id);
+        log.info("Restaurant updated successfully [restaurantId={}, userId={}]", id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -100,10 +94,10 @@ public class RestaurantController implements RestaurantControllerDocs {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<RestaurantQueryPort> findRestaurantById(@PathVariable UUID id) {
-
-        var user = findRestaurantByIdInput.execute(id);
-
-        return ResponseEntity.ok(user);
+        log.info("HTTP request received to search the restaurant by id [restaurantId={}]", id);
+        var restaurant = findRestaurantByIdInput.execute(id);
+        log.info("Restaurant found successfully, [restaurantId={}]", id);
+        return ResponseEntity.ok(restaurant);
     }
 
 

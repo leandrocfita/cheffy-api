@@ -35,7 +35,7 @@ public class UserController implements UserControllerDocs {
     private final CreateUserInput createUserInput;
     private final DeactivateUserInput deactivateUserInput;
     private final ReactivateUserInput reactivateUserInput;
-//    private final UpdateUserPasswordInput updateUserPasswordInput;
+    //    private final UpdateUserPasswordInput updateUserPasswordInput;
     private final UpdateUserInput updateUserInput;
     private final AddAddressInput addAddressInput;
     private final UpdateAddressInput updateAddressInput;
@@ -45,7 +45,6 @@ public class UserController implements UserControllerDocs {
     private final FindUserByNameInput findUserByNameInput;
 
     private final UserWebMapper mapper;
-
 
 
     public UserController(
@@ -60,10 +59,7 @@ public class UserController implements UserControllerDocs {
             RemoveAddressInput removeAddress,
             ListAllUsersInput listAllUsersInput,
             FindUserByIdInput findUserByIdInput,
-            FindUserByNameInput findUserByNameInput)
-
-
-    {
+            FindUserByNameInput findUserByNameInput) {
 //        this.updateUserPasswordInput = updateUserPasswordInput;
         this.createUserInput = createUserInput;
         this.deactivateUserInput = deactivateUserInput;
@@ -81,9 +77,9 @@ public class UserController implements UserControllerDocs {
     @Override
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody @Valid final UserCreateDTO userCreateDTO) {
-        log.info("UserController.createTbUser - START - Create user");
+        log.info("HTTP request received to create user");
         var createdId = createUserInput.execute(mapper.toCommand(userCreateDTO));
-        log.info("UserController.createTbUser - END - User created with id [{}]", createdId);
+        log.info("User created successfully [userId={}]", createdId);
         MDC.clear();
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
@@ -92,27 +88,27 @@ public class UserController implements UserControllerDocs {
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateUser(@PathVariable final UUID id,
                                            @RequestBody @Valid UserUpdateDTO userUpdateDTO) {
-        log.info("UserController.updateUser - START - Update user");
+        log.info("HTTP request received to update user [userId={}]", id);
         updateUserInput.execute(id, mapper.toCommand(userUpdateDTO));
-        log.info("UserController.updateUser - END - User updated [{}]", id);
+        log.info("User updated successfully [userId={}]", id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateUser(@PathVariable final UUID id) {
-        log.info("UserController.deactivateUser - START - Deactivate user");
+        log.info("HTTP request received to deactivate user [userId={}]", id);
         deactivateUserInput.execute(id);
-        log.info("UserController.deactivateUser - END - User deactivated [{}]", id);
+        log.info("User deactivated successfully [userId={}]", id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @PatchMapping("/{id}/reactivate")
     public ResponseEntity<Void> reactivateUser(@PathVariable final UUID id) {
-        log.info("UserController.reactivateUser - START - Reactivate user");
+        log.info("HTTP request received to reactivate user [userId={}]", id);
         reactivateUserInput.execute(id);
-        log.info("UserController.reactivateUser - END - User reactivated [{}]", id);
+        log.info("User successfully reactivated [userId={}]", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -122,14 +118,10 @@ public class UserController implements UserControllerDocs {
     public ResponseEntity<Long> addAddress(
             @PathVariable UUID userId,
             @RequestBody @Valid AddressCreateDTO dto) {
-
-        log.info("UserController.addAddress - START - User [{}]", userId);
-
+        log.info("HTTP request received to add user address [userId={}]", userId);
         addAddressInput.execute(mapper.toCommand(dto), userId);
-
-        log.info("UserController.addAddress - END");
+        log.info("Address added successfully [userId={}]", userId);
         MDC.clear();
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -139,14 +131,10 @@ public class UserController implements UserControllerDocs {
             @PathVariable UUID userId,
             @PathVariable Long addressId,
             @RequestBody @Valid AddressPatchDTO dto) {
-
-        log.info("UserController.updateAddress - START - User [{}] Address [{}]", userId, addressId);
-
+        log.info("HTTP request received to update user address [userId={}, addressId={}]", userId, addressId);
         updateAddressInput.execute(userId, addressId, mapper.toCommand(dto));
-
-        log.info("UserController.updateAddress - END");
+        log.info("Address updated successfully [userId={}, addressId={}]", userId, addressId);
         MDC.clear();
-
         return ResponseEntity.noContent().build();
     }
 
@@ -155,14 +143,10 @@ public class UserController implements UserControllerDocs {
     public ResponseEntity<Void> removeAddress(
             @PathVariable UUID userId,
             @PathVariable Long addressId) {
-
-        log.info("UserController.removeAddress - START - User [{}] Address [{}]", userId, addressId);
-
+        log.info("HTTP request received to remove the user’s address [userId={}, addressId={}]", userId, addressId);
         removeAddress.execute(userId, addressId);
-
-        log.info("UserController.removeAddress - END");
+        log.info("Address removed successfully [userId={}, addressId={}]", userId, addressId);
         MDC.clear();
-
         return ResponseEntity.noContent().build();
     }
 
@@ -173,22 +157,13 @@ public class UserController implements UserControllerDocs {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
-
-        log.info("UserController.listAllUsers - START - Listing users [page={}, size={}, sortBy={}, direction={}]",
-                page, size, sortBy, direction);
-
+        log.info("HTTP request received to search all users [page={}, size={}, sortBy={}, direction={}]", page, size, sortBy, direction);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
-
-        PageRequest pageRequest  = PageRequest.of(page, size, sortBy, sortDirection);
-
-
+        PageRequest pageRequest = PageRequest.of(page, size, sortBy, sortDirection);
         PageResult<UserQueryPort> users = listAllUsersInput.execute(pageRequest);
-
-        log.info("UserController.listAllUsers - END - Found [{}] users in page [{}]",
-                users.numberOfElements(), page);
-
+        log.info("Users found successfully, {} users were found on page {}", users.numberOfElements(), page);
         return ResponseEntity.ok(users);
     }
 
@@ -198,19 +173,13 @@ public class UserController implements UserControllerDocs {
             @PathVariable UUID id,
             @AuthenticationPrincipal Jwt jwt,
             CurrentUserMapper currentUserMapper) {
-        log.info("UserController.findUserById - START - Finding user [{}]", id);
-
+        log.info("HTTP request received to search the user by id [userId={}]", id);
         CurrentUser cuser = currentUserMapper.from(jwt);
-
         //TODO: Remover, apenas para debug e exemplo
         log.info("##### CurrentUser: id={}, login={}", cuser.id(), cuser.login());
-
-
         var user = findUserByIdInput.execute(id);
-
-        log.info("UserController.findUserById - END - User found [{}]", id);
+        log.info("User found successfully, [userId={}]", id);
         MDC.clear();
-
         return ResponseEntity.ok(user);
     }
 
@@ -223,21 +192,13 @@ public class UserController implements UserControllerDocs {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction) {
-
-        log.info("UserController.searchUsersByName - START - Searching users [name={}, page={}, size={}, sortBy={}, direction={}]",
-                name, page, size, sortBy, direction);
-
+        log.info("HTTP request received to search all users by name [name={}, [page={}, size={}, sortBy={}, direction={}]", name, page, size, sortBy, direction);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
-
         PageRequest pageRequest = PageRequest.of(page, size, sortBy, sortDirection);
-
         PageResult<UserQueryPort> users = findUserByNameInput.execute(name, pageRequest);
-
-        log.info("UserController.searchUsersByName - END - Found [{}] users with name [{}]",
-                users.numberOfElements(), name);
-
+        log.info("Users found successfully, {} users were found with the name {}", users.numberOfElements(), name);
         return ResponseEntity.ok(users);
     }
 

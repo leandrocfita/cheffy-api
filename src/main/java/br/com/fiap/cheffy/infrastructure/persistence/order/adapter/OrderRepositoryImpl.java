@@ -8,6 +8,7 @@ import br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity
 import br.com.fiap.cheffy.infrastructure.persistence.order.mapper.OrderPersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.order.repository.OrderJpaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.PageRequest.of;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class OrderRepositoryImpl implements OrderRepository {
@@ -33,6 +35,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Order save(Order order) {
+        log.debug("Saving order: {}", order);
         return orderPersistenceMapper.toDomain(
                 orderJpaRepository.save(orderPersistenceMapper.toJpa(order))
         );
@@ -40,12 +43,14 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public Optional<Order> findById(UUID id) {
+        log.debug("Finding order by id {}", id);
         return orderJpaRepository.findByIdWithItems(id)
                 .map(orderPersistenceMapper::toDomain);
     }
 
     @Override
     public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
+        log.debug("Finding all orders by customer id {} with page request {}", customerId, pageRequest);
         Sort sort = pageRequest.direction() == PageRequest.SortDirection.DESC
                 ? Sort.by(pageRequest.sortBy()).descending()
                 : Sort.by(pageRequest.sortBy()).ascending();
@@ -78,6 +83,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 .map(ordersById::get)
                 .map(orderPersistenceMapper::toDomain)
                 .toList();
+
         return PageResult.of(orders, pageRequest.page(), pageRequest.size(), page.getTotalElements());
     }
 }
