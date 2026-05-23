@@ -1,6 +1,6 @@
 package br.com.fiap.cheffy.application.order.usecase;
 
-import br.com.fiap.cheffy.application.order.dto.OrderConfirmationCommandPort;
+import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.domain.common.PageRequest;
@@ -10,7 +10,7 @@ import br.com.fiap.cheffy.domain.order.entity.OrderItem;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
 import br.com.fiap.cheffy.domain.order.exception.OrderOperationNotAllowedException;
-import br.com.fiap.cheffy.domain.order.port.output.OrderConfirmationExternalClient;
+import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import org.junit.jupiter.api.Test;
 
@@ -24,67 +24,64 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ConfirmOrderUseCaseTest {
 
-    private static final String AUTHORIZATION_HEADER = "Bearer user-token";
-
     @Test
     void executeConfirmsOrderWhenItBelongsToCustomer() {
         UUID customerId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
         StubOrderRepository repository = new StubOrderRepository(orderId, customerId, OrderStatus.CREATED);
-        StubOrderConfirmationExternalClient externalClient = new StubOrderConfirmationExternalClient();
-        ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(repository, externalClient, new OrderQueryMapper());
+        StubOrderEventPublisher eventPublisher = new StubOrderEventPublisher();
+        ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(repository, eventPublisher, new OrderQueryMapper());
 
-        OrderQueryPort result = useCase.execute(orderId, customerId, AUTHORIZATION_HEADER);
+        OrderQueryPort result = useCase.execute(orderId, customerId);
 
         assertThat(result.id()).isEqualTo(orderId);
         assertThat(result.customerId()).isEqualTo(customerId);
         assertThat(result.status()).isEqualTo(OrderStatus.PAYMENT_PENDING);
         assertThat(repository.savedOrder).isNotNull();
         assertThat(repository.savedOrder.getStatus()).isEqualTo(OrderStatus.PAYMENT_PENDING);
-        assertThat(externalClient.lastCommand.orderId()).isEqualTo(orderId);
-        assertThat(externalClient.lastCommand.totalAmount()).isEqualByComparingTo("30.00");
-        assertThat(externalClient.lastCommand.authorizationHeader()).isEqualTo(AUTHORIZATION_HEADER);
+        assertThat(eventPublisher.lastEvent.orderId()).isEqualTo(orderId);
+        assertThat(eventPublisher.lastEvent.totalAmount()).isEqualByComparingTo("30.00");
     }
 
     @Test
     void executeThrowsWhenOrderDoesNotBelongToCustomer() {
         UUID orderId = UUID.randomUUID();
-        StubOrderConfirmationExternalClient externalClient = new StubOrderConfirmationExternalClient();
+        StubOrderEventPublisher eventPublisher = new StubOrderEventPublisher();
         ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(
                 new StubOrderRepository(orderId, UUID.randomUUID(), OrderStatus.CREATED),
-                externalClient,
+                eventPublisher,
                 new OrderQueryMapper()
         );
 
-        assertThrows(OrderNotFoundException.class, () -> useCase.execute(orderId, UUID.randomUUID(), AUTHORIZATION_HEADER));
-        assertThat(externalClient.lastCommand).isNull();
+        assertThrows(OrderNotFoundException.class, () -> useCase.execute(orderId, UUID.randomUUID()));
+        assertThat(eventPublisher.lastEvent).isNull();
     }
 
     @Test
     void executeThrowsWhenOrderCannotBeConfirmedInCurrentStatus() {
         UUID customerId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
-        StubOrderConfirmationExternalClient externalClient = new StubOrderConfirmationExternalClient();
+        StubOrderEventPublisher eventPublisher = new StubOrderEventPublisher();
         ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(
                 new StubOrderRepository(orderId, customerId, OrderStatus.PAYMENT_PENDING),
-                externalClient,
+                eventPublisher,
                 new OrderQueryMapper()
         );
 
-        assertThrows(OrderOperationNotAllowedException.class, () -> useCase.execute(orderId, customerId, AUTHORIZATION_HEADER));
-        assertThat(externalClient.lastCommand).isNull();
+        assertThrows(OrderOperationNotAllowedException.class, () -> useCase.execute(orderId, customerId));
+        assertThat(eventPublisher.lastEvent).isNull();
     }
 
     @Test
-    void executeDoesNotPersistOrderWhenExternalConfirmationFails() {
+    void executeDoesNotPersistOrderWhenEventPublishingFails() {
         UUID customerId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
         StubOrderRepository repository = new StubOrderRepository(orderId, customerId, OrderStatus.CREATED);
-        StubOrderConfirmationExternalClient externalClient = new StubOrderConfirmationExternalClient();
-        externalClient.failOnConfirm = true;
-        ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(repository, externalClient, new OrderQueryMapper());
+        StubOrderEventPublisher eventPublisher = new StubOrderEventPublisher();
+        eventPublisher.failOnPublish = true;
+        ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(repository, eventPublisher, new OrderQueryMapper());
 
-        assertThrows(IllegalStateException.class, () -> useCase.execute(orderId, customerId, AUTHORIZATION_HEADER));
+        assertThrows(IllegalStateException.class, () -> useCase.execute(orderId, customerId));
         assertThat(repository.savedOrder).isNull();
     }
 
@@ -120,17 +117,17 @@ class ConfirmOrderUseCaseTest {
         }
     }
 
-    private static class StubOrderConfirmationExternalClient implements OrderConfirmationExternalClient {
+    private static class StubOrderEventPublisher implements OrderEventPublisher {
 
-        private OrderConfirmationCommandPort lastCommand;
-        private boolean failOnConfirm;
+        private OrderCreatedEventPort lastEvent;
+        private boolean failOnPublish;
 
         @Override
-        public void confirm(OrderConfirmationCommandPort command) {
-            if (failOnConfirm) {
-                throw new IllegalStateException("External service unavailable");
+        public void publishOrderCreated(OrderCreatedEventPort event) {
+            if (failOnPublish) {
+                throw new IllegalStateException("Kafka unavailable");
             }
-            this.lastCommand = command;
+            this.lastEvent = event;
         }
     }
 }

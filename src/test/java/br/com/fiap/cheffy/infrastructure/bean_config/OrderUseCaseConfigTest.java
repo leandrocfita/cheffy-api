@@ -1,6 +1,6 @@
 package br.com.fiap.cheffy.infrastructure.bean_config;
 
-import br.com.fiap.cheffy.application.order.dto.OrderConfirmationCommandPort;
+import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
 import br.com.fiap.cheffy.application.fooditem.service.FoodItemServiceHelper;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.application.order.usecase.ConfirmOrderUseCase;
@@ -12,7 +12,7 @@ import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.fooditem.port.output.FoodItemRepository;
 import br.com.fiap.cheffy.domain.order.entity.Order;
-import br.com.fiap.cheffy.domain.order.port.output.OrderConfirmationExternalClient;
+import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import br.com.fiap.cheffy.domain.restaurant.entity.Restaurant;
 import br.com.fiap.cheffy.domain.restaurant.port.output.RestaurantRepository;
@@ -52,7 +52,7 @@ class OrderUseCaseConfigTest {
 
         ConfirmOrderUseCase useCase = config.confirmOrderUseCase(
                 new StubOrderRepository(),
-                new StubOrderConfirmationExternalClient(),
+                new StubOrderEventPublisher(),
                 orderQueryMapper
         );
 
@@ -86,10 +86,10 @@ class OrderUseCaseConfigTest {
         }
     }
 
-    private static class StubOrderConfirmationExternalClient implements OrderConfirmationExternalClient {
+    private static class StubOrderEventPublisher implements OrderEventPublisher {
 
         @Override
-        public void confirm(OrderConfirmationCommandPort command) {
+        public void publishOrderCreated(OrderCreatedEventPort event) {
         }
     }
 
