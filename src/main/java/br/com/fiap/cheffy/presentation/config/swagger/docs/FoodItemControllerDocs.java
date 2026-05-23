@@ -20,6 +20,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
@@ -74,7 +76,7 @@ public interface FoodItemControllerDocs {
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
     @DefaultConflictApiResponse
-    ResponseEntity<Void> updateFoodItem(@Valid FoodItemUpdateDto foodItemUpdateDTO, @Valid UUID restaurantId, UUID userId, @Valid UUID foodItemId);
+    ResponseEntity<Void> updateFoodItem(@Valid FoodItemUpdateDto foodItemUpdateDTO, @Valid UUID restaurantId, @Valid UUID foodItemId, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Buscar item do cardápio por ID", description = "Retorna os dados completos de um item específico do cardápio de um restaurante")
     @ApiResponse(

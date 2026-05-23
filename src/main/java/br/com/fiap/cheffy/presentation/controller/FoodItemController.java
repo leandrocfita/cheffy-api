@@ -6,6 +6,8 @@ import br.com.fiap.cheffy.domain.common.PageRequest;
 import br.com.fiap.cheffy.domain.common.PageResult;
 import br.com.fiap.cheffy.domain.fooditem.entity.FoodItem;
 import br.com.fiap.cheffy.domain.fooditem.port.input.*;
+import br.com.fiap.cheffy.infrastructure.security.model.CurrentUser;
+import br.com.fiap.cheffy.infrastructure.security.resolver.CurrentUserMapper;
 import br.com.fiap.cheffy.presentation.config.swagger.docs.FoodItemControllerDocs;
 import br.com.fiap.cheffy.presentation.dto.FoodItemAvailabilityDTO;
 import br.com.fiap.cheffy.presentation.dto.FoodItemDTO;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +39,7 @@ public class FoodItemController implements FoodItemControllerDocs {
     private final FindFoodItemByIdInput findFoodItemByIdInput;
     private final ListFoodItemsByRestaurantInput listFoodItemsByRestaurantInput;
     private final FoodItemWebMapper foodItemWebMapper;
+    private final CurrentUserMapper currentUserMapper;
 
     public FoodItemController(CreateFoodItemInput createFoodItemInput,
                               DeactivateFoodItemInput deactivateFoodItemInput,
@@ -43,7 +48,7 @@ public class FoodItemController implements FoodItemControllerDocs {
                               ListFoodItemsByRestaurantInput listFoodItemsByRestaurantInput,
                               FindFoodItemByIdInput findFoodItemByIdInput,
                               UpdateFoodItemInput updateFoodItemInput,
-                              FoodItemWebMapper foodItemWebMapper) {
+                              FoodItemWebMapper foodItemWebMapper, CurrentUserMapper currentUserMapper) {
         this.createFoodItemInput = createFoodItemInput;
         this.findFoodItemByIdInput = findFoodItemByIdInput;
         this.listFoodItemsByRestaurantInput = listFoodItemsByRestaurantInput;
@@ -52,6 +57,7 @@ public class FoodItemController implements FoodItemControllerDocs {
         this.updateFoodItemAvailabilityInput = updateFoodItemAvailabilityInput;
         this.foodItemWebMapper = foodItemWebMapper;
         this.updateFoodItemInput = updateFoodItemInput;
+        this.currentUserMapper = currentUserMapper;
     }
 
     @Override
@@ -92,13 +98,14 @@ public class FoodItemController implements FoodItemControllerDocs {
     public ResponseEntity<Void> updateFoodItem(
             @RequestBody @Valid FoodItemUpdateDto foodItemUpdateDTO,
             @PathVariable @Valid UUID restaurantId,
-            @RequestAttribute("userId") UUID userId,
-            @PathVariable @Valid UUID foodItemId
+            @PathVariable @Valid UUID foodItemId,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        log.info("Updating food item [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, userId);
+        CurrentUser currentUser = currentUserMapper.from(jwt);
+        log.info("Updating food item [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, currentUser.id());
         FoodItemCommandPort foodItemCommandPort = foodItemWebMapper.foodItemDtoToFoodItemCommandPort(foodItemUpdateDTO, restaurantId);
-        updateFoodItemInput.update(foodItemId, restaurantId, userId, foodItemCommandPort);
-        log.info("Food item updated successfully [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, userId);
+        updateFoodItemInput.update(foodItemId, restaurantId, currentUser.id(), foodItemCommandPort);
+        log.info("Food item updated successfully [foodItemId={}, restaurantId={}, userId={}]", foodItemId, restaurantId, currentUser.id());
         return ResponseEntity.noContent().build();
     }
 

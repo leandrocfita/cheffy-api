@@ -17,6 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.UUID;
 
@@ -65,21 +67,21 @@ public interface RestaurantControllerDocs {
                     )
             )
     )
-    ResponseEntity<String> registerRestaurant(@Valid RestaurantCreateDTO restaurantCreateDTO, @Valid UUID userId);
+    ResponseEntity<String> registerRestaurant(@Valid RestaurantCreateDTO restaurantCreateDTO, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Desativar restaurante de um usuário")
     @ApiResponse(responseCode = "204", description = "Restaurante desativado com sucesso")
     @DefaultBadRequestApiResponse
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
-    ResponseEntity<Void> deactivateRestaurant(@Valid UUID id, @Valid UUID userId);
+    ResponseEntity<Void> deactivateRestaurant(@Valid UUID id, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Reativar restaurante de um usuário")
     @ApiResponse(responseCode = "204", description = "Restaurante reativado com sucesso")
     @DefaultBadRequestApiResponse
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
-    ResponseEntity<Void> reactivateRestaurant(@Valid UUID id, @Valid UUID userId);
+    ResponseEntity<Void> reactivateRestaurant(@Valid UUID id, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Atualizar dados de um restaurante", description = "Atualiza os dados de um restaurante existente. Somente o proprietário pode atualizar. Restaurantes desativados não podem ser atualizados.")
     @ApiResponse(responseCode = "204", description = "Restaurante atualizado com sucesso")
@@ -87,7 +89,7 @@ public interface RestaurantControllerDocs {
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
     @DefaultConflictApiResponse
-    ResponseEntity<Void> updateRestaurant(UUID id, UUID userId, @Valid RestaurantUpdateDTO restaurantUpdateDTO);
+    ResponseEntity<Void> updateRestaurant(UUID id, @Valid RestaurantUpdateDTO restaurantUpdateDTO, @AuthenticationPrincipal Jwt jwt);
 
     @Operation(summary = "Buscar restaurante por ID", description = "Retorna os dados completos de um restaurante com seu cardápio")
     @DefaultApiErrors
