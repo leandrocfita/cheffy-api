@@ -87,8 +87,7 @@ public class OrderController implements OrderControllerDocs {
 
         OrderQueryPort confirmedOrder = confirmOrderInput.execute(
                 orderId,
-                currentUser.id(),
-                "Bearer " + jwt.getTokenValue()
+                currentUser.id()
         );
 
         log.info("OrderController.confirmOrder - END - Order [{}] confirmed", confirmedOrder.id());

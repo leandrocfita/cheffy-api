@@ -6,7 +6,7 @@ import br.com.fiap.cheffy.application.order.usecase.ConfirmOrderUseCase;
 import br.com.fiap.cheffy.application.order.usecase.CreateOrderUseCase;
 import br.com.fiap.cheffy.application.order.usecase.FindOrderByIdUseCase;
 import br.com.fiap.cheffy.application.order.usecase.ListOrdersByCustomerUseCase;
-import br.com.fiap.cheffy.domain.order.port.output.OrderConfirmationExternalClient;
+import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,10 +33,10 @@ public class OrderUseCaseConfig {
     @Bean
     public ConfirmOrderUseCase confirmOrderUseCase(
             OrderRepository orderRepository,
-            OrderConfirmationExternalClient orderConfirmationExternalClient,
+            OrderEventPublisher orderEventPublisher,
             OrderQueryMapper orderQueryMapper
     ) {
-        return new ConfirmOrderUseCase(orderRepository, orderConfirmationExternalClient, orderQueryMapper);
+        return new ConfirmOrderUseCase(orderRepository, orderEventPublisher, orderQueryMapper);
     }
 
     @Bean

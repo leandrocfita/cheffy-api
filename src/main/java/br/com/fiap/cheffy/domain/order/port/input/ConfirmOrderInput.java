@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface ConfirmOrderInput {
 
-    OrderQueryPort execute(UUID orderId, UUID customerId, String authorizationHeader);
+    OrderQueryPort execute(UUID orderId, UUID customerId);
 }

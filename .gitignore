@@ -80,6 +80,8 @@ build/
 
 ####### SECRETS ##############
 *.env
+keys/
+*.pem
 
 #### AI Agents rules
 GEMINI.md
