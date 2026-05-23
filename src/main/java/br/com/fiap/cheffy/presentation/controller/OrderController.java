@@ -67,12 +67,9 @@ public class OrderController implements OrderControllerDocs {
             @AuthenticationPrincipal Jwt jwt
     ) {
         CurrentUser currentUser = currentUserMapper.from(jwt);
-        log.info("OrderController.createOrder - START - Create order for user [{}]", currentUser.id());
-
+        log.info("HTTP request received to create order for user [userId={}]", currentUser.id());
         CreateOrderResultPort createdOrder = createOrderInput.execute(orderWebMapper.toCommand(orderCreateDTO), currentUser.id());
-
-        log.info("OrderController.createOrder - END - Order created with id [{}]", createdOrder.orderId());
-
+        log.info("Order created successfully for user [userId={}]", currentUser.id());
         return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
     }
 
@@ -83,15 +80,12 @@ public class OrderController implements OrderControllerDocs {
             @AuthenticationPrincipal Jwt jwt
     ) {
         CurrentUser currentUser = currentUserMapper.from(jwt);
-        log.info("OrderController.confirmOrder - START - Confirm order [{}] for user [{}]", orderId, currentUser.id());
-
+        log.info("HTTP request received to confirm order [orderId={}] for user [userId={}]", orderId, currentUser.id());
         OrderQueryPort confirmedOrder = confirmOrderInput.execute(
                 orderId,
                 currentUser.id()
         );
-
-        log.info("OrderController.confirmOrder - END - Order [{}] confirmed", confirmedOrder.id());
-
+        log.info("Order [{}] confirmed successfully for user [userId={}]", confirmedOrder.id(), currentUser.id());
         return ResponseEntity.ok(confirmedOrder);
     }
 
@@ -102,7 +96,10 @@ public class OrderController implements OrderControllerDocs {
             @AuthenticationPrincipal Jwt jwt
     ) {
         CurrentUser currentUser = currentUserMapper.from(jwt);
-        return ResponseEntity.ok(findOrderByIdInput.execute(orderId, currentUser.id()));
+        log.info("HTTP request received to find order by id [orderId={}] for user [userId={}]", orderId, currentUser.id());
+        var order = findOrderByIdInput.execute(orderId, currentUser.id());
+        log.info("Order found successfully [orderId={}] for user [userId={}]", orderId, currentUser.id());
+        return ResponseEntity.ok(order);
     }
 
     @GetMapping
@@ -115,9 +112,12 @@ public class OrderController implements OrderControllerDocs {
             @RequestParam(defaultValue = "DESC") Sort.Direction direction
     ) {
         CurrentUser currentUser = currentUserMapper.from(jwt);
+        log.info("HTTP request received to search all orders [userId={}, page={}, size={}, sortBy={}, direction={}]", currentUser.id(), page, size, sortBy, direction);
         PageRequest.SortDirection sortDirection = direction == Sort.Direction.DESC
                 ? PageRequest.SortDirection.DESC
                 : PageRequest.SortDirection.ASC;
-        return ResponseEntity.ok(listOrdersByCustomerInput.execute(currentUser.id(), PageRequest.of(page, size, sortBy, sortDirection)));
+        var order = listOrdersByCustomerInput.execute(currentUser.id(), PageRequest.of(page, size, sortBy, sortDirection));
+        log.info("Orders found successfully for user [userId={}], {} orders were found on page {}", currentUser.id(), order.numberOfElements(), page);
+        return ResponseEntity.ok(order);
     }
 }

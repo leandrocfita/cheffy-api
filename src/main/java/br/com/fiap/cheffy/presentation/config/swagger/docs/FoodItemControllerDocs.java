@@ -66,7 +66,7 @@ public interface FoodItemControllerDocs {
                     )
             )
     )
-    ResponseEntity<FoodItemQueryPort> postFoodItem(@Valid FoodItemDTO foodItemDTO, @Valid UUID restaurantId);
+    ResponseEntity<FoodItemQueryPort> createFoodItem(@Valid FoodItemDTO foodItemDTO, @Valid UUID restaurantId);
 
     @Operation(summary = "Update an existing food item", description = "Updates an existing food item associated with a specific restaurant")
     @ApiResponse(responseCode = "204", description = "Item atualizado com sucesso")
@@ -88,7 +88,7 @@ public interface FoodItemControllerDocs {
     @DefaultBadRequestApiResponse
     @DefaultApiErrors
     @DefaultNotFoundApiResponse
-    ResponseEntity<FoodItemQueryPort> getFoodItemById(UUID restaurantId, UUID foodItemId);
+    ResponseEntity<FoodItemQueryPort> findFoodItemById(UUID restaurantId, UUID foodItemId);
 
     @Operation(summary = "Desativar food item de um restaurante")
     @ApiResponse(responseCode = "204", description = "Food item desativado com sucesso")

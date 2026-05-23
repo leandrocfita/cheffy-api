@@ -68,6 +68,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidDataException.class)
     private ResponseEntity<Object> handleInvalidDataException(InvalidDataException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("InvalidDataException -> request: {}, message: {}", requestDesc, ex.getMessage(), ex);
 
         String title = getExceptionName(ex);
         String message = getMessage(GENERIC_ERROR_MESSAGE);
@@ -88,6 +90,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestaurantOperationNotAllowedException.class)
     private ResponseEntity<Object> handleRestaurantOperationNotAllowedException(RestaurantOperationNotAllowedException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("RestaurantOperationNotAllowed -> request: {}, reason: {}", requestDesc, ex.getMessage(), ex);
+
         String message = getMessage(ex.getMessage());
 
         HttpStatus httpStatusCode = HttpStatus.CONFLICT;
@@ -104,6 +109,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UserOperationNotAllowedException.class)
     private ResponseEntity<Object> handleUserOperationNotAllowedException(UserOperationNotAllowedException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("UserOperationNotAllowed -> request: {}, message: {}", requestDesc, ex.getMessage(), ex);
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -123,6 +130,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestaurantNotFoundException.class)
     private ResponseEntity<Object> handleRestaurantNotFoundException(RestaurantNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("RestaurantNotFound -> request: {}, id: {}", requestDesc, ex.getId());
+
         String message = getMessage(ex.getMessage());
         message = String.format(message, ex.getId().toString());
 
@@ -140,6 +150,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     private ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("UserNotFound -> request: {}, id: {}", requestDesc, ex.getId());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -160,6 +172,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     private ResponseEntity<Object> handleInvalidPasswordException(InvalidPasswordException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("InvalidPassword -> request: {}, minLength: {}", requestDesc, ex.getMinPasswordLength());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -180,6 +194,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidPostalCodeException.class)
     private ResponseEntity<Object> handleInvalidPostalCodeException(InvalidPostalCodeException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("InvalidPostalCode -> request: {}, minLength: {}", requestDesc, ex.getMinPostalCodeLength());
+
         String title = getExceptionName(ex);
 
         String message = getMessage(ex.getMessage());
@@ -199,6 +216,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AddressNotFoundException.class)
     private ResponseEntity<Object> handleAddressNotFoundException(AddressNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("AddressNotFound -> request: {}, id: {}", requestDesc, ex.getId());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -220,6 +239,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ProfileNotFoundException.class)
     private ResponseEntity<Object> handleProfileNotFoundException(ProfileNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("ProfileNotFound -> request: {}, type: {}", requestDesc, ex.getType());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -240,6 +261,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OperationNotAllowedException.class)
     private ResponseEntity<Object> handleOperationNotAllowedException(OperationNotAllowedException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("OperationNotAllowed -> request: {}, message: {}", requestDesc, ex.getMessage());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -259,6 +282,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TokenExpiredException.class)
     private ResponseEntity<Object> handleTokenExpiredException(TokenExpiredException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("TokenExpired -> request: {}, subject: {}", requestDesc, ex.getMessage());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -278,6 +303,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(LoginFailedException.class)
     private ResponseEntity<Object> handleLoginFailedException(LoginFailedException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("LoginFailed -> request: {}, originalMessage: {}", requestDesc, ex.getOriginalMessage(), ex);
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -298,6 +325,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RegisterFailedException.class)
     private ResponseEntity<Object> handleRegisterFailedException(RegisterFailedException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("RegisterFailed -> request: {}, message: {}", requestDesc, ex.getMessage(), ex);
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -317,6 +346,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ProfileAlreadyExistException.class)
     public ResponseEntity<Object> handleProfileAlreadyExist(ProfileAlreadyExistException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("ProfileAlreadyExist -> request: {}, type: {}", requestDesc, ex.getType());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -332,6 +363,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ProfileIsOwnerOrClientException.class)
     public ResponseEntity<Object> handleProfileIsOwnerOrClientException(ProfileIsOwnerOrClientException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("ProfileIsOwnerOrClient -> request: {}, message: {}", requestDesc, ex.getMessage());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
 
@@ -344,6 +378,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestaurantInactiveException.class)
     private ResponseEntity<Object> handleRestaurantInactiveException(RestaurantInactiveException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("RestaurantInactive -> request: {}, id: {}", requestDesc, ex.getId());
+
         String message = getMessage(ex.getMessage());
         message = String.format(message, ex.getId().toString());
 
@@ -361,6 +398,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestaurantDoesNotExistException.class)
     public ResponseEntity<Object> handleRestaurantDoesNotExist(RestaurantDoesNotExistException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("RestaurantDoesNotExist -> request: {}, type: {}", requestDesc, ex.getType());
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -376,6 +415,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FoodItemAlreadyExistInRestaurant.class)
     public ResponseEntity<Object> handleFoodItemAlreadyExistInRestaurant(FoodItemAlreadyExistInRestaurant ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("FoodItemAlreadyExistInRestaurant -> request: {}, type: {}", requestDesc, ex.getType());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
 
@@ -390,6 +432,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FoodItemDoesNotExist.class)
     public ResponseEntity<Object> handleFoodItemDoesNotExist(FoodItemDoesNotExist ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("FoodItemDoesNotExist -> request: {}, type: {}", requestDesc, ex.getType());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
 
@@ -404,6 +449,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FoodItemUnavailableForOrderException.class)
     public ResponseEntity<Object> handleFoodItemUnavailableForOrderException(FoodItemUnavailableForOrderException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("FoodItemUnavailableForOrder -> request: {}, id: {}", requestDesc, ex.getId());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
 
@@ -422,14 +470,25 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
+        String requestDesc = request.getDescription(false);
 
         if (rootCause instanceof InvalidFormatException invalidFormatException) {
+            log.warn("HttpMessageNotReadable -> invalid format - request: {}, path: {}, value: {}",
+                    requestDesc,
+                    invalidFormatException.getPathReference(),
+                    invalidFormatException.getValue(),
+                    invalidFormatException);
             return handleInvalidFormat(invalidFormatException, headers, status, request);
         } else if (rootCause instanceof PropertyBindingException propertyBindingException) {
+            log.warn("HttpMessageNotReadable -> property binding - request: {}, path: {}",
+                    requestDesc,
+                    propertyBindingException.getPathReference(),
+                    propertyBindingException);
             return handlePropertyBinding(propertyBindingException, headers, status, request);
         }
 
         String detail = getMessage(ERROR_ON_DESERIALIZATION);
+        log.warn("HttpMessageNotReadable -> request: {}, detail: {}", requestDesc, detail, ex);
 
         Problem problem = createProblemBuilder(
                 status,
@@ -445,9 +504,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                          HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         String path = joinPath(ex.getPath());
-
+        String requestDesc = request.getDescription(false);
         String detail = String.format(getMessage(PROPERTY_BINDING_ERROR),
                 path, ex.getReferringClass().getSimpleName());
+
+        log.debug("PropertyBindingException -> request: {}, path: {}, referring: {}",
+                requestDesc, path, ex.getReferringClass().getSimpleName(), ex);
 
         Problem problem = createProblemBuilder(
                 status,
@@ -464,9 +526,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                                                        HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         String path = joinPath(ex.getPath());
-
+        String requestDesc = request.getDescription(false);
         String detail = String.format(getMessage(INVALID_FORMAT_ERROR),
                 path, ex.getValue(), ex.getTargetType().getSimpleName());
+
+        log.debug("InvalidFormatException -> request: {}, path: {}, value: {}, targetType: {}",
+                requestDesc, path, ex.getValue(), ex.getTargetType().getSimpleName(), ex);
 
         Problem problem = createProblemBuilder(
                 status,
@@ -480,6 +545,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(FoodItemNotFoundException.class)
     public ResponseEntity<Object> handleFoodItemNotFoundException(FoodItemNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("FoodItemNotFound -> request: {}, id: {}", requestDesc, ex.getId());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
         message = String.format(message, ex.getId().toString());
@@ -498,6 +566,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<Object> handleOrderNotFoundException(OrderNotFoundException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("OrderNotFound -> request: {}, id: {}", requestDesc, ex.getId());
+
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
         message = String.format(message, ex.getId().toString());
@@ -516,6 +587,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ClientUnavailableException.class)
     public ResponseEntity<Object> handleClientUnavailableException(ClientUnavailableException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("ClientUnavailable -> request: {}, client: {}", requestDesc, ex.getMessage(), ex);
+
         String detail = getMessage(CLIENT_UNAVAILABLE);
         HttpStatus httpStatusCode = HttpStatus.SERVICE_UNAVAILABLE;
 
@@ -533,6 +607,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @Nullable
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.info("MethodArgumentNotValid -> request: {}, errors: {}", requestDesc, ex.getBindingResult().getErrorCount());
 
         String userMessage = getMessage(ARGUMENT_NOT_VALID_ERROR);
         String detail = getMessage(ERROR_ON_DESERIALIZATION);
@@ -563,6 +639,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidOperationException.class)
     private ResponseEntity<Object> handleInvalidOperationException(InvalidOperationException ex, WebRequest request) {
+        String requestDesc = request.getDescription(false);
+        log.warn("InvalidOperation -> request: {}, message: {}", requestDesc, ex.getMessage(), ex);
 
         String title = getExceptionName(ex);
         String message = getMessage(ex.getMessage());
@@ -581,7 +659,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
-
         String detail = getMessage(GENERIC_ERROR_MESSAGE);
 
         Problem problem = createProblemBuilder(
@@ -618,6 +695,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                     .title(string)
                     .userMessage(getMessage(GENERIC_ERROR_MESSAGE))
                     .build();
+            log.debug("handleExceptionInternal with String body -> request: {}, title: {}", request.getDescription(false), string);
         }
 
         return super.handleExceptionInternal(ex, body, headers, status, request);

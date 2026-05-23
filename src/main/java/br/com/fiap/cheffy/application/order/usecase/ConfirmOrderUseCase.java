@@ -8,11 +8,13 @@ import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
 import br.com.fiap.cheffy.domain.order.port.input.ConfirmOrderInput;
 import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
 import static br.com.fiap.cheffy.shared.exception.keys.ExceptionsKeys.ORDER_NOT_FOUND_EXCEPTION;
 
+@Slf4j
 public class ConfirmOrderUseCase implements ConfirmOrderInput {
 
     private final OrderRepository orderRepository;
@@ -34,13 +36,13 @@ public class ConfirmOrderUseCase implements ConfirmOrderInput {
         Order order = orderRepository.findById(orderId)
                 .filter(savedOrder -> savedOrder.getCustomerId().equals(customerId))
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_EXCEPTION, orderId));
-
+        log.info("Starting order confirmation - orderId: {}", orderId);
         order.markPaymentPending();
         orderEventPublisher.publishOrderCreated(new OrderCreatedEventPort(
                 order.getId(),
                 order.getTotalAmount().value()
         ));
-
+        log.info("Order confirmation completed");
         return orderQueryMapper.toQueryPort(orderRepository.save(order));
     }
 }

@@ -9,6 +9,7 @@ import br.com.fiap.cheffy.infrastructure.persistence.profile.entity.ProfileJpaEn
 import br.com.fiap.cheffy.infrastructure.persistence.profile.mapper.ProfilePersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.profile.repository.ProfileJpaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ProfileRepositoryImpl implements ProfileRepository {
@@ -25,18 +27,21 @@ public class ProfileRepositoryImpl implements ProfileRepository {
 
     @Override
     public Optional<Profile> findById(Long id) {
+        log.debug("Finding profile by id {}", id);
         return profileJpaRepository.findById(id)
                 .map(mapper::toDomain);
     }
 
     @Override
     public Optional<Profile> findByType(String type) {
+        log.debug("Finding profile by type {}", type);
         return profileJpaRepository.findByType(type)
                 .map(mapper::toDomain);
     }
 
     @Override
     public Long save(Profile profileDomain) {
+        log.debug("Saving profile {}", profileDomain.getType());
         ProfileJpaEntity profileJpa = mapper.toJpaReference(profileDomain);
         return profileJpaRepository.save(profileJpa).getId();
     }
@@ -44,6 +49,7 @@ public class ProfileRepositoryImpl implements ProfileRepository {
     @Override
     @Transactional(readOnly = true)
     public PageResult<Profile> findAll(PageRequest pageRequest) {
+        log.debug("Finding all profiles with page request {}", pageRequest);
         Pageable springPageable = PageMapper.toSpringPageable(pageRequest);
         Page<ProfileJpaEntity> springPage = profileJpaRepository.findAll(springPageable);
         Page<Profile> domainPage = springPage.map(mapper::toDomain);
@@ -53,6 +59,7 @@ public class ProfileRepositoryImpl implements ProfileRepository {
 
     @Override
     public void delete(Profile profileDomain) {
+        log.debug("Deleting profile {}", profileDomain.getType());
         ProfileJpaEntity profileJpa = mapper.toJpaReference(profileDomain);
         profileJpaRepository.delete(profileJpa);
     }
