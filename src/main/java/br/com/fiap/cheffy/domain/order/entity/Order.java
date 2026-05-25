@@ -59,16 +59,13 @@ public class Order {
         return total;
     }
 
-    public void markPaymentPending() {
-        if (this.status != OrderStatus.CREATED) {
+    public void markNewStatus(OrderStatus newStatus) {
+        if (this.status == newStatus) {
             throw new OrderOperationNotAllowedException(ORDER_CANNOT_BE_CONFIRMED);
         }
-        this.status = OrderStatus.PAYMENT_PENDING;
+        this.status = newStatus;
     }
 
-    public void markAsPaid() {
-        this.status = OrderStatus.PAID;
-    }
 
     public UUID getId() {
         return id;
