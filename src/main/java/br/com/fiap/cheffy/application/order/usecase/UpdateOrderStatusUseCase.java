@@ -1,6 +1,7 @@
 package br.com.fiap.cheffy.application.order.usecase;
 
 import br.com.fiap.cheffy.domain.order.entity.Order;
+import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
 import br.com.fiap.cheffy.domain.order.port.input.UpdateOrderStatusInput;
 import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
@@ -32,20 +33,9 @@ public class UpdateOrderStatusUseCase implements UpdateOrderStatusInput {
             return;
         }
 
-        switch (status.toUpperCase()) {
-            case "PAYMENT_PENDING" -> {
-                order.markPaymentPending();
-                log.info("Order status changed to PAYMENT_PENDING - orderId: {}", orderId);
-            }
-            case "PAID" -> {
-                order.markPaymentPending();
-                log.info("Order status changed to PAID - orderId: {}", orderId);
-            }
-            default -> {
-                log.error("Unsupported order status received - orderId: {}, status: {}", orderId, status);
-                return;
-            }
-        }
+        OrderStatus newStatus = OrderStatus.fromStatus(status);
+        order.markNewStatus(newStatus);
+        log.info("Order status updated to {} - orderId: {}", newStatus, orderId);
 
         orderRepository.save(order);
         log.debug("Order status persisted - orderId: {}", orderId);
