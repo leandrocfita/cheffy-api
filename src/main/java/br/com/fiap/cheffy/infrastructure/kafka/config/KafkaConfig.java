@@ -1,6 +1,6 @@
 package br.com.fiap.cheffy.infrastructure.kafka.config;
 
-import br.com.fiap.cheffy.infrastructure.kafka.dto.OrderStatusUpdatedEvent;
+import br.com.fiap.cheffy.infrastructure.adapters.in.records.InputOrderStatusRecord;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,19 +35,18 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, OrderStatusUpdatedEvent> consumerFactory() {
-        JsonDeserializer<OrderStatusUpdatedEvent> deserializer =
-                new JsonDeserializer<>(OrderStatusUpdatedEvent.class);
+    public ConsumerFactory<String, InputOrderStatusRecord> consumerFactory() {
+        JsonDeserializer<InputOrderStatusRecord> deserializer =
+                new JsonDeserializer<>(InputOrderStatusRecord.class);
         deserializer.addTrustedPackages("br.com.fiap.cheffy.infrastructure.kafka.dto");
         deserializer.setUseTypeHeaders(false);
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), deserializer);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OrderStatusUpdatedEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, OrderStatusUpdatedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, InputOrderStatusRecord> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, InputOrderStatusRecord> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
 }
