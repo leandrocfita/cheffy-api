@@ -4,6 +4,7 @@ import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
 import br.com.fiap.cheffy.application.order.dto.OrderQueryPort;
 import br.com.fiap.cheffy.application.order.mapper.OrderQueryMapper;
 import br.com.fiap.cheffy.domain.order.entity.Order;
+import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
 import br.com.fiap.cheffy.domain.order.port.input.ConfirmOrderInput;
 import br.com.fiap.cheffy.domain.order.port.output.OrderEventPublisher;
@@ -37,7 +38,7 @@ public class ConfirmOrderUseCase implements ConfirmOrderInput {
                 .filter(savedOrder -> savedOrder.getCustomerId().equals(customerId))
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_EXCEPTION, orderId));
         log.info("Starting order confirmation - orderId: {}", orderId);
-        order.markPaymentPending();
+        order.markNewStatus(OrderStatus.PENDING);
         orderEventPublisher.publishOrderCreated(new OrderCreatedEventPort(
                 order.getId(),
                 order.getTotalAmount().value()

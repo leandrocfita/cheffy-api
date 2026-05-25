@@ -36,9 +36,9 @@ class ConfirmOrderUseCaseTest {
 
         assertThat(result.id()).isEqualTo(orderId);
         assertThat(result.customerId()).isEqualTo(customerId);
-        assertThat(result.status()).isEqualTo(OrderStatus.PAYMENT_PENDING);
+        assertThat(result.status()).isEqualTo(OrderStatus.PENDING);
         assertThat(repository.savedOrder).isNotNull();
-        assertThat(repository.savedOrder.getStatus()).isEqualTo(OrderStatus.PAYMENT_PENDING);
+        assertThat(repository.savedOrder.getStatus()).isEqualTo(OrderStatus.PENDING);
         assertThat(eventPublisher.lastEvent.orderId()).isEqualTo(orderId);
         assertThat(eventPublisher.lastEvent.totalAmount()).isEqualByComparingTo("30.00");
     }
@@ -63,7 +63,7 @@ class ConfirmOrderUseCaseTest {
         UUID orderId = UUID.randomUUID();
         StubOrderEventPublisher eventPublisher = new StubOrderEventPublisher();
         ConfirmOrderUseCase useCase = new ConfirmOrderUseCase(
-                new StubOrderRepository(orderId, customerId, OrderStatus.PAYMENT_PENDING),
+                new StubOrderRepository(orderId, customerId, OrderStatus.PENDING),
                 eventPublisher,
                 new OrderQueryMapper()
         );

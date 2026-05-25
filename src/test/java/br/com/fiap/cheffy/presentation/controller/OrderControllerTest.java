@@ -112,7 +112,7 @@ class OrderControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().id()).isEqualTo(orderId);
-        assertThat(response.getBody().status()).isEqualTo(OrderStatus.PAYMENT_PENDING);
+        assertThat(response.getBody().status()).isEqualTo(OrderStatus.PENDING);
         assertThat(confirmOrderInput.customerId).isEqualTo(userId);
     }
 
@@ -183,7 +183,7 @@ class OrderControllerTest {
                     customerId,
                     UUID.randomUUID(),
                     new BigDecimal("30.00"),
-                    OrderStatus.PAYMENT_PENDING,
+                    OrderStatus.PENDING,
                     List.of(new OrderItemQueryPort(UUID.randomUUID(), "Burger", 2, new BigDecimal("15.00")))
             );
         }
