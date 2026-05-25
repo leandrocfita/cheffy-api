@@ -1,8 +1,8 @@
 package br.com.fiap.cheffy.domain.order.port.input;
 
-import java.util.UUID;
+import br.com.fiap.cheffy.application.order.ports.in.records.OrderStatusCommandRecord;
 
 public interface UpdateOrderStatusInput {
 
-    void execute(UUID orderId, String status);
+    void execute(OrderStatusCommandRecord request);
 }

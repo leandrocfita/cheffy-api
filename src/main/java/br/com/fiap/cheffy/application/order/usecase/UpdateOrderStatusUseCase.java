@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.application.order.usecase;
 
+import br.com.fiap.cheffy.application.order.ports.in.records.OrderStatusCommandRecord;
 import br.com.fiap.cheffy.domain.order.entity.Order;
 import br.com.fiap.cheffy.domain.order.entity.OrderStatus;
 import br.com.fiap.cheffy.domain.order.exception.OrderNotFoundException;
@@ -21,23 +22,23 @@ public class UpdateOrderStatusUseCase implements UpdateOrderStatusInput {
     }
 
     @Override
-    public void execute(UUID orderId, String status) {
-        log.info("Received order status update request - orderId: {}, newStatus: {}", orderId, status);
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_EXCEPTION, orderId));
+    public void execute(OrderStatusCommandRecord request) {
+        log.info("Received order status update request - orderId: {}, newStatus: {}", request.orderId(), request.status());
+        Order order = orderRepository.findById(request.orderId())
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND_EXCEPTION, request.orderId()));
 
-        log.debug("Order found for status update - orderId: {}", orderId);
+        log.debug("Order found for status update - orderId: {}", request.orderId());
 
-        if (order.getStatus().name().equalsIgnoreCase(status)) {
-            log.info("Order status is already '{}' - no update needed - orderId: {}", status, orderId);
+        if (order.getStatus().name().equalsIgnoreCase(request.status())) {
+            log.info("Order status is already '{}' - no update needed - orderId: {}", request.status(), request.orderId());
             return;
         }
 
-        OrderStatus newStatus = OrderStatus.fromStatus(status);
+        OrderStatus newStatus = OrderStatus.fromStatus(request.status());
         order.markNewStatus(newStatus);
-        log.info("Order status updated to {} - orderId: {}", newStatus, orderId);
+        log.info("Order status updated to {} - orderId: {}", newStatus, request.orderId());
 
         orderRepository.save(order);
-        log.debug("Order status persisted - orderId: {}", orderId);
+        log.debug("Order status persisted - orderId: {}", request.orderId());
     }
 }

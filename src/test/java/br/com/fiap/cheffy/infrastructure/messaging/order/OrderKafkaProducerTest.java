@@ -1,7 +1,7 @@
 package br.com.fiap.cheffy.infrastructure.messaging.order;
 
 import br.com.fiap.cheffy.application.order.dto.OrderCreatedEventPort;
-import br.com.fiap.cheffy.infrastructure.kafka.producer.OrderKafkaProducer;
+import br.com.fiap.cheffy.infrastructure.adapters.out.producer.OrderKafkaProducer;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
