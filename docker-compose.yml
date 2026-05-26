@@ -149,8 +149,16 @@ services:
       - cheffy-network
     depends_on:
       - mongoDb
+      - kafka
+      - auth-service
+      - procpag
     ports:
       - "8083:8083"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongoDb:27017/cheffy-order-service?authSource=admin
+      PAYMENT_API_URL: http://procpag:8089
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://auth-service:8085/.well-known/jwks.json
 
 networks:
   cheffy-network:
