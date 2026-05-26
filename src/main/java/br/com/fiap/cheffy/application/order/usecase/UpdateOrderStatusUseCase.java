@@ -29,7 +29,7 @@ public class UpdateOrderStatusUseCase implements UpdateOrderStatusInput {
 
         log.debug("Order found for status update - orderId: {}", request.orderId());
 
-        if (order.getStatus().name().equalsIgnoreCase(request.status())) {
+        if (order.getStatus().getStatus().equalsIgnoreCase(request.status())) {
             log.info("Order status is already '{}' - no update needed - orderId: {}", request.status(), request.orderId());
             return;
         }
