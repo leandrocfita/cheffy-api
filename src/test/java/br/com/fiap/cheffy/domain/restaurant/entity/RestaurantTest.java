@@ -6,6 +6,7 @@ import br.com.fiap.cheffy.domain.profile.entity.Profile;
 import br.com.fiap.cheffy.domain.restaurant.exception.RestaurantOperationNotAllowedException;
 import br.com.fiap.cheffy.domain.restaurant.valueobject.WorkingHours;
 import br.com.fiap.cheffy.domain.user.entity.Address;
+import br.com.fiap.cheffy.domain.user.entity.AuthStatus;
 import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.exception.UserOperationNotAllowedException;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,8 @@ class RestaurantTest {
 
     @Test
     void createRestaurantSetsOwnerAndValidState() {
-        User owner = new User(UUID.randomUUID(), "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User owner = new User(UUID.randomUUID(), "Name", "email@test.com", "login", true, AuthStatus.CONFIRMED);
+
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
 
         Restaurant restaurant = Restaurant.createWithWorkingHours(
@@ -44,7 +46,7 @@ class RestaurantTest {
 
     @Test
     void create24hRestaurantSetsOwnerAndValidState() {
-        User owner = new User(UUID.randomUUID(), "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User owner = new User(UUID.randomUUID(), "Name", "email@test.com", "login", true, AuthStatus.CONFIRMED);
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
 
         Restaurant restaurant = Restaurant.create24h(
@@ -303,7 +305,7 @@ class RestaurantTest {
     @Test
     void isOwnedByUserReturnsTrueWhenOwnerIsActiveAndHasOwnerProfile() {
         UUID userId = UUID.randomUUID();
-        User owner = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User owner = new User(userId, "Name", "email@test.com", "login", true, AuthStatus.CONFIRMED);
         owner.addProfile(Profile.create(1L, ProfileType.OWNER.name()));
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
         Restaurant restaurant = Restaurant.create24h("R", "27865757000102", "Italiana", zoneId, owner);
@@ -314,7 +316,7 @@ class RestaurantTest {
     @Test
     void isOwnedByUserReturnsFalseWhenDifferentUserId() {
         UUID userId = UUID.randomUUID();
-        User owner = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User owner = new User(UUID.randomUUID(), "Name", "email@test.com", "login", true, AuthStatus.CONFIRMED);
         owner.addProfile(Profile.create(1L, ProfileType.OWNER.name()));
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
         Restaurant restaurant = Restaurant.create24h("R", "27865757000102", "Italiana", zoneId, owner);
@@ -325,7 +327,7 @@ class RestaurantTest {
     @Test
     void isOwnedByUserReturnsFalseWhenUserIsInactive() {
         UUID userId = UUID.randomUUID();
-        User owner = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", false);
+        User owner = new User(UUID.randomUUID(), "Name", "email@test.com", "login", false, AuthStatus.CONFIRMED);
         owner.addProfile(Profile.create(1L, ProfileType.OWNER.name()));
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
         Restaurant restaurant = Restaurant.create24h("R", "27865757000102", "Italiana", zoneId, owner);
@@ -336,7 +338,7 @@ class RestaurantTest {
     @Test
     void isOwnedByUserReturnsFalseWhenUserHasNoOwnerProfile() {
         UUID userId = UUID.randomUUID();
-        User owner = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User owner = new User(UUID.randomUUID(), "Name", "email@test.com", "login", true, AuthStatus.CONFIRMED);
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
         Restaurant restaurant = Restaurant.create24h("R", "27865757000102", "Italiana", zoneId, owner);
 

@@ -1,5 +1,6 @@
 package br.com.fiap.cheffy.infrastructure.persistence.user.entity;
 
+import br.com.fiap.cheffy.domain.user.entity.AuthStatus;
 import br.com.fiap.cheffy.infrastructure.persistence.address.entity.AddressJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.profile.entity.ProfileJpaEntity;
 import jakarta.persistence.*;
@@ -32,11 +33,8 @@ public class UserJpaEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
-    private String login;
-
-    @Column(nullable = false)
-    private String password;
+    @Column(unique = true)
+    private  String authId;
 
     @ManyToMany
     @JoinTable(
@@ -60,6 +58,10 @@ public class UserJpaEntity {
 
     @Column(nullable = false)
     private boolean active;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuthStatus authStatus;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

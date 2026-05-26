@@ -5,6 +5,7 @@ import br.com.fiap.cheffy.application.user.service.UserServiceHelper;
 import br.com.fiap.cheffy.domain.user.entity.Address;
 import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ class AddAddressUseCaseTest {
     @Test
     void executeAddsAddressAndSavesUser() {
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "Jane Doe", "jane@example.com", "janed", "Password1!Strong", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         AddressCommandPort command = new AddressCommandPort(
                 "Main Street",
                 123,
@@ -67,7 +68,7 @@ class AddAddressUseCaseTest {
     @Test
     void executeReplacesExistingMainAddressWhenNewMainIsAdded() {
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "John Doe", "john@example.com", "johnd", "Password1!Strong", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         Address existing = Address.create(
                 "Old Street",
                 10,

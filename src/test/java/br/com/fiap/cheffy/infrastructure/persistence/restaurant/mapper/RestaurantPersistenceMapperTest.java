@@ -11,6 +11,7 @@ import br.com.fiap.cheffy.infrastructure.persistence.fooditem.mapper.FoodItemPer
 import br.com.fiap.cheffy.infrastructure.persistence.restaurant.entity.RestaurantJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.entity.UserJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.mapper.UserPersistenceMapper;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,7 @@ class RestaurantPersistenceMapperTest {
 
     @Test
     void toJpaMapsRestaurantIncludingAddressAndUser() {
-        User owner = new User(UUID.randomUUID(), "Owner", "mail@test.com", "owner", "Pass@12345678", true);
+        User owner = UserTestUtils.createOwnerUserDomainEntity();
         ZoneId zoneId = ZoneId.of("America/Sao_Paulo");
 
         Restaurant restaurant = Restaurant.createWithWorkingHours(
@@ -89,7 +90,7 @@ class RestaurantPersistenceMapperTest {
         entity.setFoodItems(Set.of(foodItemJpa));
 
         Address address = new Address(1L, "Rua A", 10, "São Paulo", "01001000", "Centro", "SP", "Casa", true);
-        User owner = new User(UUID.randomUUID(), "Owner", "mail@test.com", "owner", "Pass@12345678", true);
+        User owner = UserTestUtils.createOwnerUserDomainEntity();
         FoodItem foodItem = FoodItem.reconstitute(
                 foodItemJpa.getId(),
                 "Prato",

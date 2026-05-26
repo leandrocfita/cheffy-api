@@ -42,7 +42,7 @@ class UpdateFoodItemUseCaseTest {
         UUID restaurantId = UUID.randomUUID();
         UUID foodItemId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        
+
         FoodItemCommandPort foodItemCommandPort = new FoodItemCommandPort("Novo Nome", "Nova Desc", BigDecimal.TEN, "url", restaurantId, true, true, true);
 
         Restaurant restaurant = mock(Restaurant.class);
@@ -80,7 +80,7 @@ class UpdateFoodItemUseCaseTest {
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(RestaurantNotFoundException.class, () -> 
+        assertThrows(RestaurantNotFoundException.class, () ->
                 updateFoodItemUseCase.update(foodItemId, restaurantId, userId, foodItemCommandPort));
 
         verify(foodItemRepository, never()).save(any());
@@ -100,7 +100,7 @@ class UpdateFoodItemUseCaseTest {
         // When & Then
         assertThrows(RuntimeException.class, () -> // Replace with FoodItemNotFoundException.class if you have it
                 updateFoodItemUseCase.update(foodItemId, restaurantId, userId, foodItemCommandPort));
-        
+
         verify(foodItemRepository, never()).save(any());
     }
 }

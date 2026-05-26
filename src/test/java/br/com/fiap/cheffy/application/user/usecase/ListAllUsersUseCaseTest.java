@@ -122,8 +122,6 @@ class ListAllUsersUseCaseTest {
         User user = User.create(
                 name,
                 email,
-                name.toLowerCase().replace(" ", "."),
-                "Pass@1234567890",
                 profile
         );
 

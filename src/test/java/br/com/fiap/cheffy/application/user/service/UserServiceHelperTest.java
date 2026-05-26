@@ -1,10 +1,12 @@
 package br.com.fiap.cheffy.application.user.service;
 
-import br.com.fiap.cheffy.application.user.dto.UserQueryPort;
-import br.com.fiap.cheffy.application.user.mapper.UserQueryMapper;
+import br.com.fiap.cheffy.application.user.service.UserServiceHelper;
 import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.exception.UserNotFoundException;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
+import br.com.fiap.cheffy.utils.UserTestUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,8 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceHelperTest {
@@ -24,49 +26,39 @@ class UserServiceHelperTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private UserQueryMapper mapper;
-
     @InjectMocks
-    private UserServiceHelper userServiceHelper;
+    private UserServiceHelper userServiceHelper; // This will be a real instance with mocks injected
 
-    @Test
-    void getUserOrFailReturnsUser() {
-        UUID id = UUID.randomUUID();
-        User user = new User(id, "Name", "email@test.com", "login", "pass", true);
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+    @Nested
+    @DisplayName("Tests for getUserById method")
+    class GetUserByIdTests {
 
-        User result = userServiceHelper.getUserOrFail(id);
+        @Test
+        @DisplayName("Should return user when a valid id is provided")
+        void shouldReturnUser_WhenValidIdIsProvided() {
 
-        assertThat(result).isEqualTo(user);
-    }
+            var userId = UUID.randomUUID();
+            User expectedUser = UserTestUtils.createClientUserDomainEntity();
+            when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
 
-    @Test
-    void getUserOrFailThrowsIfNotFound() {
-        UUID id = UUID.randomUUID();
-        when(userRepository.findById(id)).thenReturn(Optional.empty());
+            User actualUser = userServiceHelper.getUserOrFail(userId);
 
-        assertThrows(UserNotFoundException.class, () -> userServiceHelper.getUserOrFail(id));
-    }
+            assertThat(actualUser.getId()).isEqualTo(expectedUser.getId());
+            verify(userRepository).findById(userId);
+        }
 
-    @Test
-    void saveUserDelegatesToRepository() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
-        when(userRepository.save(user)).thenReturn(user);
+        @Test
+        @DisplayName("Should throw UserNotFoundException when an invalid id is provided")
+        void shouldThrowUserNotFoundException_WhenInvalidIdIsProvided() {
+            // Arrange
+            var userId = UUID.randomUUID();
+            when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        User result = userServiceHelper.saveUser(user);
+            // Act & Assert
+            assertThatThrownBy(() -> userServiceHelper.getUserOrFail(userId))
+                    .isInstanceOf(UserNotFoundException.class);
 
-        assertThat(result).isEqualTo(user);
-    }
-
-    @Test
-    void userToQueryPortMapsUser() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
-        UserQueryPort queryPort = new UserQueryPort(UUID.randomUUID().toString(),"Name", "email@test.com", "login", true, null, null);
-        when(mapper.toQuery(user)).thenReturn(queryPort);
-
-        UserQueryPort result = userServiceHelper.userToQueryPort(user);
-
-        assertThat(result).isEqualTo(queryPort);
+            verify(userRepository).findById(userId);
+        }
     }
 }

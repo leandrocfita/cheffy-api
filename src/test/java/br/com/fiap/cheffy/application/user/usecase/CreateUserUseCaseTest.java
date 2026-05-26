@@ -8,9 +8,11 @@ import br.com.fiap.cheffy.domain.profile.exception.ProfileNotFoundException;
 import br.com.fiap.cheffy.domain.profile.port.output.ProfileRepository;
 import br.com.fiap.cheffy.domain.user.entity.Address;
 import br.com.fiap.cheffy.domain.user.entity.User;
-import br.com.fiap.cheffy.domain.user.port.input.PasswordEncoderPort;
+import br.com.fiap.cheffy.domain.user.port.output.AuthUserExternalClient;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
 import br.com.fiap.cheffy.shared.exception.RegisterFailedException;
+import br.com.fiap.cheffy.utils.AddressTestUtils;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,16 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CreateUserUseCaseTest {
@@ -41,35 +39,35 @@ class CreateUserUseCaseTest {
     private ProfileRepository profileRepository;
 
     @Mock
-    private PasswordEncoderPort passwordEncoder;
+    private AuthUserExternalClient authUserExternalClient;
 
     private CreateUserUseCase createUserUseCase;
 
     @BeforeEach
     void setUp() {
-        createUserUseCase = new CreateUserUseCase(userRepository, profileRepository, passwordEncoder);
+        createUserUseCase = new CreateUserUseCase(userRepository, profileRepository, authUserExternalClient);
     }
 
     @Test
-    void executeCreatesUserWithAddressAndEncodesPassword() {
+    void executeCreatesUserWithAddress() {
         UserCommandPort command = buildCommand();
         Profile profile = Profile.create(7L, ProfileType.CLIENT.name());
-        String encodedPassword = "encoded-password";
-        User savedUser = new User(UUID.randomUUID(), command.name(), command.email(), command.login(), encodedPassword, true);
+        User savedUser =  UserTestUtils.createAFullActiveUserEntity();
+        Address mainAddress = AddressTestUtils.createTestAddressDomainEntity();
+
+        savedUser.addAddress(mainAddress);
 
         when(profileRepository.findByType(ProfileType.CLIENT.name())).thenReturn(Optional.of(profile));
-        when(passwordEncoder.encode(command.password())).thenReturn(encodedPassword);
-        when(userRepository.existsByEmailOrLogin(command.email(), command.login())).thenReturn(false);
+        when(userRepository.findByEmail(command.email())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         String result = createUserUseCase.execute(command);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
+        verify(userRepository, times(2)).save(userCaptor.capture());
         User capturedUser = userCaptor.getValue();
 
         assertEquals(savedUser.getId().toString(), result);
-        assertEquals(encodedPassword, capturedUser.getPassword());
 
         Set<Address> addresses = capturedUser.getAddresses();
         assertEquals(1, addresses.size());
@@ -97,12 +95,11 @@ class CreateUserUseCaseTest {
     }
 
     @Test
-    void executeThrowsWhenEmailOrLoginAlreadyExists() {
+    void executeThrowsWhenEmailAlreadyExists() {
         UserCommandPort command = buildCommand();
         Profile profile = Profile.create(7L, ProfileType.CLIENT.name());
-        when(profileRepository.findByType(ProfileType.CLIENT.name())).thenReturn(Optional.of(profile));
-        when(passwordEncoder.encode(command.password())).thenReturn("encoded-password");
-        when(userRepository.existsByEmailOrLogin(command.email(), command.login())).thenReturn(true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
+        when(userRepository.findByEmail(command.email())).thenReturn(Optional.of(user));
 
         assertThrows(RegisterFailedException.class, () -> createUserUseCase.execute(command));
 
@@ -111,12 +108,12 @@ class CreateUserUseCaseTest {
 
     private UserCommandPort buildCommand() {
         AddressCommandPort address = new AddressCommandPort(
-                "Rua A",
+                "Main St",
                 123,
-                "Sao Paulo",
-                "01000000",
-                "Centro",
-                "SP",
+                "Test City",
+                "12345678",
+                "Test Hood",
+                "TS",
                 "Ap 11",
                 true
         );

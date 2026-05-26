@@ -5,7 +5,7 @@ import br.com.fiap.cheffy.application.user.mapper.UserQueryMapper;
 import br.com.fiap.cheffy.application.user.service.UserServiceHelper;
 import br.com.fiap.cheffy.application.user.usecase.*;
 import br.com.fiap.cheffy.domain.profile.port.output.ProfileRepository;
-import br.com.fiap.cheffy.infrastructure.bean_config.ProfileUseCaseConfig;
+import br.com.fiap.cheffy.domain.user.port.output.AuthUserExternalClient;
 import br.com.fiap.cheffy.domain.user.port.input.AuthenticationManagerPort;
 import br.com.fiap.cheffy.domain.user.port.input.PasswordEncoderPort;
 import br.com.fiap.cheffy.domain.user.port.input.TokenGeneratorPort;
@@ -25,15 +25,13 @@ class BeanConfigTest {
     @Mock
     private ProfileRepository profileRepository;
     @Mock
-    private PasswordEncoderPort passwordEncoder;
-    @Mock
-    private AuthenticationManagerPort authManager;
-    @Mock
     private TokenGeneratorPort tokenGenerator;
     @Mock
     private UserQueryMapper userQueryMapper;
     @Mock
     private RestaurantRepository restaurantRepository;
+    @Mock
+    private AuthUserExternalClient authClient;
 
     @Test
     void userUseCaseConfigCreatesBeans() {
@@ -45,7 +43,7 @@ class BeanConfigTest {
         DeactivateUserUseCase deactivate = config.deactivateUserUseCase(userRepository, restaurantRepository);
         assertThat(deactivate).isNotNull();
 
-        CreateUserUseCase createUser = config.createUserUseCase(userRepository, profileRepository, passwordEncoder);
+        CreateUserUseCase createUser = config.createUserUseCase(userRepository, profileRepository, authClient);
         assertThat(createUser).isNotNull();
 
         UpdateUserUseCase updateUser = config.updateUserUseCase(userRepository);
@@ -60,11 +58,7 @@ class BeanConfigTest {
         RemoveAddressUseCase removeAddress = config.removeAddressUseCase(helper, userRepository);
         assertThat(removeAddress).isNotNull();
 
-        LoginUseCase login = config.loginUseCase(authManager, tokenGenerator);
-        assertThat(login).isNotNull();
 
-        UpdateUserPasswordUseCase updatePassword = config.updateUserPasswordUseCase(userRepository, passwordEncoder);
-        assertThat(updatePassword).isNotNull();
 
         ListAllUsersUseCase listAll = config.listAllUsersUseCase(userRepository, userQueryMapper);
         assertThat(listAll).isNotNull();

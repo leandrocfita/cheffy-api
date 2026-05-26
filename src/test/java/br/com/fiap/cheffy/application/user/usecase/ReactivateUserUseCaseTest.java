@@ -4,6 +4,7 @@ import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.domain.user.exception.UserNotFoundException;
 import br.com.fiap.cheffy.domain.user.exception.UserOperationNotAllowedException;
 import br.com.fiap.cheffy.domain.user.port.output.UserRepository;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,7 @@ class ReactivateUserUseCaseTest {
     @Test
     void executeReactivatesInactiveUser() {
         UUID id = UUID.randomUUID();
-        User user = new User(id, "Name", "email@test.com", "login", "pass", false);
+        User user = UserTestUtils.createAFullNonActiveUserEntity();
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
         useCase.execute(id);
@@ -53,7 +54,7 @@ class ReactivateUserUseCaseTest {
     @Test
     void executeThrowsWhenUserAlreadyActive() {
         UUID id = UUID.randomUUID();
-        User user = new User(id, "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
         assertThrows(UserOperationNotAllowedException.class, () -> useCase.execute(id));

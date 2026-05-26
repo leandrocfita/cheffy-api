@@ -14,6 +14,7 @@ import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.shared.exception.InvalidDataException;
 import br.com.fiap.cheffy.shared.exception.RegisterFailedException;
 import br.com.fiap.cheffy.shared.exception.keys.ExceptionsKeys;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ class RegisterRestaurantUseCaseTest {
         RestaurantCommandPort command = RestaurantCommandPortTestBuilder.aValidCommand().build();
 
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User user = UserTestUtils.createClientUserDomainEntity();
         Profile ownerProfile = Profile.create(1L, ProfileType.OWNER.name());
 
         when(restaurantRepository.existsByName(command.name())).thenReturn(false);
@@ -93,7 +94,7 @@ class RegisterRestaurantUseCaseTest {
 
         UUID userId = UUID.randomUUID();
         UUID savedRestaurantId = UUID.randomUUID();
-        User user = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User user = UserTestUtils.createOwnerUserDomainEntity();
         Profile ownerProfile = Profile.create(1L, ProfileType.OWNER.name());
         user.addProfile(ownerProfile);
 
@@ -144,7 +145,7 @@ class RegisterRestaurantUseCaseTest {
         RestaurantCommandPort command = RestaurantCommandPortTestBuilder.aValidCommand().build();
 
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User user = UserTestUtils.createClientUserDomainEntity();
 
         when(restaurantRepository.existsByName(command.name())).thenReturn(false);
         when(restaurantRepository.existsByCnpj(command.cnpj())).thenReturn(false);
@@ -169,7 +170,7 @@ class RegisterRestaurantUseCaseTest {
                 .withZoneId("Invalid")
                 .build();
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
+        User user = UserTestUtils.createOwnerUserDomainEntity();
 
         when(restaurantRepository.existsByName(command.name())).thenReturn(false);
         when(restaurantRepository.existsByCnpj(command.cnpj())).thenReturn(false);
@@ -189,13 +190,11 @@ class RegisterRestaurantUseCaseTest {
                 new br.com.fiap.cheffy.application.user.dto.AddressCommandPort(
                         "Rua A", 123, "Sao Paulo", "01001000", "Centro", "SP", null, null));
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, "Owner", "owner@mail.com", "owner", "Password@1234", true);
-        Profile ownerProfile = Profile.create(1L, ProfileType.OWNER.name());
+        User user = UserTestUtils.createOwnerUserDomainEntity();
 
         when(restaurantRepository.existsByName(command.name())).thenReturn(false);
         when(restaurantRepository.existsByCnpj(command.cnpj())).thenReturn(false);
         when(userServiceHelper.getUserOrFail(userId)).thenReturn(user);
-        when(profileRepository.findByType(ProfileType.OWNER.name())).thenReturn(Optional.of(ownerProfile));
         when(restaurantServiceHelper.extractZoneId(command.zoneId())).thenReturn(ZoneId.of(command.zoneId()));
 
         Restaurant savedRestaurant = mock(Restaurant.class);

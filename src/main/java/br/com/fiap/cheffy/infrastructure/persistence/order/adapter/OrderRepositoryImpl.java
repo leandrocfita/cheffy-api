@@ -1,0 +1,89 @@
+package br.com.fiap.cheffy.infrastructure.persistence.order.adapter;
+
+import br.com.fiap.cheffy.domain.common.PageRequest;
+import br.com.fiap.cheffy.domain.common.PageResult;
+import br.com.fiap.cheffy.domain.order.entity.Order;
+import br.com.fiap.cheffy.domain.order.port.output.OrderRepository;
+import br.com.fiap.cheffy.infrastructure.persistence.order.entity.OrderJpaEntity;
+import br.com.fiap.cheffy.infrastructure.persistence.order.mapper.OrderPersistenceMapper;
+import br.com.fiap.cheffy.infrastructure.persistence.order.repository.OrderJpaRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.PageRequest.of;
+
+@Slf4j
+@Repository
+@RequiredArgsConstructor
+public class OrderRepositoryImpl implements OrderRepository {
+
+    private final OrderJpaRepository orderJpaRepository;
+    private final OrderPersistenceMapper orderPersistenceMapper;
+
+    @Override
+    public Order save(Order order) {
+        log.debug("Saving order: {}", order);
+        return orderPersistenceMapper.toDomain(
+                orderJpaRepository.save(orderPersistenceMapper.toJpa(order))
+        );
+    }
+
+    @Override
+    public Optional<Order> findById(UUID id) {
+        log.debug("Finding order by id {}", id);
+        return orderJpaRepository.findByIdWithItems(id)
+                .map(orderPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public PageResult<Order> findAllByCustomerId(UUID customerId, PageRequest pageRequest) {
+        log.debug("Finding all orders by customer id {} with page request {}", customerId, pageRequest);
+        Sort sort = pageRequest.direction() == PageRequest.SortDirection.DESC
+                ? Sort.by(pageRequest.sortBy()).descending()
+                : Sort.by(pageRequest.sortBy()).ascending();
+
+        Pageable springPageRequest = of(pageRequest.page(), pageRequest.size(), sort);
+
+        Page<OrderJpaEntity> page =
+                orderJpaRepository.findAllByCustomerId(customerId, springPageRequest);
+
+        List<UUID> orderIds = page.getContent()
+                .stream()
+                .map(OrderJpaEntity::getId)
+                .toList();
+
+        if (orderIds.isEmpty()) {
+            return PageResult.of(Collections.emptyList(), pageRequest.page(), pageRequest.size(), page.getTotalElements());
+        }
+
+        Map<UUID, OrderJpaEntity> ordersById =
+                orderJpaRepository.findAllByIdInWithItems(orderIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                OrderJpaEntity::getId,
+                                Function.identity(),
+                                (first, ignored) -> first,
+                                LinkedHashMap::new
+                        ));
+
+        List<Order> orders = orderIds.stream()
+                .map(ordersById::get)
+                .map(orderPersistenceMapper::toDomain)
+                .toList();
+
+        return PageResult.of(orders, pageRequest.page(), pageRequest.size(), page.getTotalElements());
+    }
+}

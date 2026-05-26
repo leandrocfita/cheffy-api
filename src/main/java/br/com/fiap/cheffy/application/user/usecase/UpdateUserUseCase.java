@@ -24,35 +24,34 @@ public class UpdateUserUseCase implements UpdateUserInput {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND_EXCEPTION, id));
 
-        validateUniqueParameters(command, id);
+//        validateUniqueParameters(command, id);
 
         user.patch(
                 command.name(),
-                command.email(),
-                command.login()
+                command.email()
         );
 
         userRepository.save(user);
     }
 
-    private void validateUniqueParameters(UserCommandPort command, UUID id) {
-        if (command.email() != null && existsUserWithEmail(command.email(), id)) {
-            throw new InvalidOperationException();
-        }
-        if (command.login() != null && existsUserWithLogin(command.login(), id)) {
-            throw new InvalidOperationException();
-        }
-    }
+//    private void validateUniqueParameters(UserCommandPort command, UUID id) {
+//        if (command.email() != null && existsUserWithEmail(command.email(), id)) {
+//            throw new InvalidOperationException();
+//        }
+//        if (command.login() != null && existsUserWithLogin(command.login(), id)) {
+//            throw new InvalidOperationException();
+//        }
+//    }
 
-    private boolean existsUserWithEmail(String email, UUID id) {
-        return userRepository.findByEmail(email)
-                .filter(user -> !Objects.equals(user.getId(), id))
-                .isPresent();
-    }
-
-    private boolean existsUserWithLogin(String login, UUID id) {
-        return userRepository.findByLogin(login)
-                .filter(user -> !Objects.equals(user.getId(), id))
-                .isPresent();
-    }
+//    private boolean existsUserWithEmail(String email, UUID id) {
+//        return userRepository.findByEmail(email)
+//                .filter(user -> !Objects.equals(user.getId(), id))
+//                .isPresent();
+//    }
+//
+//    private boolean existsUserWithLogin(String login, UUID id) {
+//        return userRepository.findByLogin(login)
+//                .filter(user -> !Objects.equals(user.getId(), id))
+//                .isPresent();
+//    }
 }

@@ -48,7 +48,7 @@ public class FoodItemTestUtils {
 
         RestaurantJpaEntity restaurant = RestaurantTestUtils.createTestRestaurantJpaEntity();
         entity.setRestaurant(restaurant);
-        
+
         return entity;
     }
 

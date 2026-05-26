@@ -16,16 +16,12 @@ class UserJpaEntityTest {
         entity.setId(UUID.randomUUID());
         entity.setName("Name");
         entity.setEmail("email@test.com");
-        entity.setLogin("login");
-        entity.setPassword("pass");
         entity.setProfiles(new HashSet<>());
         entity.setAddresses(new HashSet<>());
 
         assertThat(entity.getId()).isNotNull();
         assertThat(entity.getName()).isEqualTo("Name");
         assertThat(entity.getEmail()).isEqualTo("email@test.com");
-        assertThat(entity.getLogin()).isEqualTo("login");
-        assertThat(entity.getPassword()).isEqualTo("pass");
         assertThat(entity.getProfiles()).isNotNull();
         assertThat(entity.getAddresses()).isNotNull();
     }

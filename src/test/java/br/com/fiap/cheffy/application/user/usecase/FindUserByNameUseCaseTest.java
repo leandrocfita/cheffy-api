@@ -120,8 +120,6 @@ class FindUserByNameUseCaseTest {
         User user = User.create(
                 name,
                 email,
-                name.toLowerCase().replace(" ", "."),
-                "Pass@123456",
                 profile
         );
 

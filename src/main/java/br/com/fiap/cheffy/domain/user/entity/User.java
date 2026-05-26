@@ -14,44 +14,47 @@ import static br.com.fiap.cheffy.shared.exception.keys.ExceptionsKeys.*;
 
 public class User {
 
-    private static final int MIN_PASSWORD_LENGTH = 12; //TODO parametrizar
-
     private UUID id;
     private String name;
     private String email;
-    private String login;
+
+    private String authId;
+    private AuthStatus authStatus;
     private boolean active;
 
-    private String password;
     private Set<Profile> profiles = new HashSet<>();
     private Set<Address> addresses = new HashSet<>();
 
     protected User() {}
 
-    public User(UUID id, String name, String email, String login, String password, boolean active) {
+    public User(UUID id, String name, String email, String authId, boolean active, AuthStatus authStatus) {
         this.id = id;
         this.name = Objects.requireNonNull(name);
         this.email = Objects.requireNonNull(email);
-        this.login = Objects.requireNonNull(login);
-        this.password = Objects.requireNonNull(password);
         this.active = active;
+        this.authId = authId;
+        this.authStatus = authStatus;
+    }
+
+    public void updatePendingUserInformation(String name, Address newAddress){
+        this.name = name;
+        this.addresses.clear();
+        this.addAddress(newAddress);
     }
 
     /*Factory Method*/
     public static User create(
             String name,
             String email,
-            String login,
-            String encodedPassword,
             Profile profile
     ) {
         User user = new User(
                 null,
                 name,
                 email,
-                login,
-                encodedPassword,
-                true
+                null,
+                true,
+                AuthStatus.PENDING
         );
 
         user.addProfile(profile);
@@ -60,12 +63,10 @@ public class User {
 
     public void patch(
             String name,
-            String email,
-            String login
+            String email
     ) {
         if (name != null && !name.isEmpty()) this.name = name;
         if (email != null && !email.isEmpty()) this.email = email;
-        if (login != null && !login.isEmpty()) this.login = login;
     }
 
     public void deactivate() {
@@ -125,6 +126,15 @@ public class User {
                         ADDRESS_NOT_FOUND_EXCEPTION,
                         addressId
                 ));
+    }
+
+    public void finishAuthIntegration(String authId){
+        this.authId = authId;
+        this.authStatus = AuthStatus.CONFIRMED;
+    }
+
+    public void integrationFailed(){
+        this.authStatus = AuthStatus.FAILED;
     }
 
     public void addAddress(Address address) {
@@ -188,43 +198,15 @@ public class User {
         }
     }
 
-    /* Password */
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void changePassword(String password) {
-        validatePassword(password);
-        setPassword(password);
-    }
-
-    public static void validatePassword(String password) {
-
-        if (password == null) {
-            throw new InvalidPasswordException(
-                    INVALID_PASSWORD_MSG, MIN_PASSWORD_LENGTH
-            );
-        }
-
-        boolean hasUppercase = password.chars().anyMatch(Character::isUpperCase);
-        boolean hasLowercase = password.chars().anyMatch(Character::isLowerCase);
-        boolean hasDigit = password.chars().anyMatch(Character::isDigit);
-        boolean hasSymbol = password.chars().anyMatch(
-                ch -> !Character.isLetterOrDigit(ch)
-        );
-
-        if (!(password.length() >= MIN_PASSWORD_LENGTH
-                && hasUppercase
-                && hasLowercase
-                && hasDigit
-                && hasSymbol)) {
-            throw new InvalidPasswordException(
-                    INVALID_PASSWORD_MSG, MIN_PASSWORD_LENGTH);
-        }
-    }
 
     //Getters
+    public AuthStatus getAuthStatus() {
+        return authStatus;
+    }
+
+    public String getAuthId() {
+        return authId;
+    }
 
     public UUID getId() {
         return id;
@@ -236,14 +218,6 @@ public class User {
 
     public String getName() {
         return name;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public Set<Address> getAddresses() {

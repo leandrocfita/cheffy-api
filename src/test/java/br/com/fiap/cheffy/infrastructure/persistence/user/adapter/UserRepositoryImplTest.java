@@ -6,6 +6,7 @@ import br.com.fiap.cheffy.domain.user.entity.User;
 import br.com.fiap.cheffy.infrastructure.persistence.user.entity.UserJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.mapper.UserPersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.user.repository.UserJpaRepository;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,7 +38,7 @@ class UserRepositoryImplTest {
 
     @Test
     void saveUser() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         UserJpaEntity jpaEntity = new UserJpaEntity();
         when(mapper.toJpa(user)).thenReturn(jpaEntity);
         when(jpaRepository.save(jpaEntity)).thenReturn(jpaEntity);
@@ -49,30 +50,8 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    void existsByEmailOrLogin() {
-        when(jpaRepository.existsByEmailOrLogin("email@test.com", "login")).thenReturn(true);
-
-        boolean exists = userRepository.existsByEmailOrLogin("email@test.com", "login");
-
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void findByLogin() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
-        UserJpaEntity jpaEntity = new UserJpaEntity();
-        when(jpaRepository.findByLogin("login")).thenReturn(Optional.of(jpaEntity));
-        when(mapper.toDomain(jpaEntity)).thenReturn(user);
-
-        Optional<User> result = userRepository.findByLogin("login");
-
-        assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(user);
-    }
-
-    @Test
     void findByEmail() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         UserJpaEntity jpaEntity = new UserJpaEntity();
         when(jpaRepository.findByEmail("email@test.com")).thenReturn(Optional.of(jpaEntity));
         when(mapper.toDomain(jpaEntity)).thenReturn(user);
@@ -86,7 +65,7 @@ class UserRepositoryImplTest {
     @Test
     void findById() {
         UUID id = UUID.randomUUID();
-        User user = new User(id, "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         UserJpaEntity jpaEntity = new UserJpaEntity();
         when(jpaRepository.findById(id)).thenReturn(Optional.of(jpaEntity));
         when(mapper.toDomain(jpaEntity)).thenReturn(user);
@@ -101,7 +80,7 @@ class UserRepositoryImplTest {
     void findAll() {
         PageRequest pageRequest = PageRequest.of(0, 10);
         UserJpaEntity entity = new UserJpaEntity();
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         Page<UserJpaEntity> springPage = new PageImpl<>(List.of(entity));
         when(jpaRepository.findAll(any(Pageable.class))).thenReturn(springPage);
         when(mapper.toDomain(entity)).thenReturn(user);
@@ -109,6 +88,6 @@ class UserRepositoryImplTest {
         PageResult<User> result = userRepository.findAll(pageRequest);
 
         assertThat(result.content()).hasSize(1);
-        assertThat(result.content().get(0)).isEqualTo(user);
+        assertThat(result.content().getFirst()).isEqualTo(user);
     }
 }

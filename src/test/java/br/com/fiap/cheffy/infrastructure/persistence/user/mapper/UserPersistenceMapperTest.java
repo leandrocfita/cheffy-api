@@ -9,6 +9,7 @@ import br.com.fiap.cheffy.infrastructure.persistence.profile.entity.ProfileJpaEn
 import br.com.fiap.cheffy.infrastructure.persistence.profile.mapper.ProfilePersistenceMapper;
 import br.com.fiap.cheffy.infrastructure.persistence.address.entity.AddressJpaEntity;
 import br.com.fiap.cheffy.infrastructure.persistence.user.entity.UserJpaEntity;
+import br.com.fiap.cheffy.utils.UserTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,20 +46,20 @@ class UserPersistenceMapperTest {
 
     @Test
     void toJpaMapsUserToJpaEntity() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
-        user.addProfile(Profile.create(1L, "CLIENT"));
+        User user = UserTestUtils.createAFullActiveUserEntity();
+        user.addProfile(Profile.create(1L, ProfileType.CLIENT.getType()));
         when(profileMapper.toJpaReference(any())).thenReturn(new ProfileJpaEntity());
 
         UserJpaEntity result = mapper.toJpa(user);
 
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo("Name");
-        assertThat(result.getEmail()).isEqualTo("email@test.com");
+        assertThat(result.getName()).isEqualTo("John");
+        assertThat(result.getEmail()).isEqualTo("john@email.com");
     }
 
     @Test
     void toJpaMapsUserWithAddresses() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addProfile(Profile.create(1L, "CLIENT"));
         Address address1 = new Address(1L, "Street", 123, "City", "12345678", "Neighborhood", "SP", null, true);
         user.addAddress(address1);
@@ -74,7 +75,7 @@ class UserPersistenceMapperTest {
 
     @Test
     void toJpaMapsUserWithProfiles() {
-        User user = new User(UUID.randomUUID(), "Name", "email@test.com", "login", "pass", true);
+        User user = UserTestUtils.createAFullActiveUserEntity();
         user.addProfile(Profile.create(1L, "CLIENT"));
         ProfileJpaEntity profileJpa = new ProfileJpaEntity();
         when(profileMapper.toJpaReference(any())).thenReturn(profileJpa);
@@ -90,8 +91,6 @@ class UserPersistenceMapperTest {
         entity.setId(UUID.randomUUID());
         entity.setName("Name");
         entity.setEmail("email@test.com");
-        entity.setLogin("login");
-        entity.setPassword("pass");
         entity.setProfiles(new HashSet<>());
         entity.setAddresses(new HashSet<>());
 
@@ -108,10 +107,8 @@ class UserPersistenceMapperTest {
         entity.setId(UUID.randomUUID());
         entity.setName("Name");
         entity.setEmail("email@test.com");
-        entity.setLogin("login");
-        entity.setPassword("pass");
         entity.setProfiles(new HashSet<>());
-        
+
         AddressJpaEntity addressJpa = new AddressJpaEntity();
         addressJpa.setId(1L);
         addressJpa.setStreetName("Street");
@@ -136,14 +133,12 @@ class UserPersistenceMapperTest {
         entity.setId(UUID.randomUUID());
         entity.setName("Name");
         entity.setEmail("email@test.com");
-        entity.setLogin("login");
-        entity.setPassword("pass");
         entity.setAddresses(new HashSet<>());
-        
+
         ProfileJpaEntity profileJpa = new ProfileJpaEntity();
         profileJpa.setType("CLIENT");
         entity.setProfiles(Set.of(profileJpa));
-        
+
         Profile profile = Profile.create(1L, "CLIENT");
         when(profileMapper.toDomain(any())).thenReturn(profile);
 

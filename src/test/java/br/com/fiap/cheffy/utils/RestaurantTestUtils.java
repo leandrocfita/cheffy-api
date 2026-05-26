@@ -70,7 +70,7 @@ public class RestaurantTestUtils {
         entity.setClosingTime(LocalTime.of(22, 0));
         entity.setOpen24hours(false);
         entity.setZoneId(ZoneId.systemDefault().getId());
-        
+
         AddressJpaEntity address = new AddressJpaEntity();
         address.setStreetName("Main St");
         address.setCity("Test City");
