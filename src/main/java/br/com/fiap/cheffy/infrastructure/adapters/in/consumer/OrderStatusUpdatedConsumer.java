@@ -28,6 +28,5 @@ public class OrderStatusUpdatedConsumer {
         log.info("Message received: [message={}]", message);
         updateOrderStatusUseCase.execute(inputOrderStatusMapper.toCommand(message));
         log.info("Message processed successfully: [orderId={}, status={}]", message.orderId(), message.status());
-        //log.error("Error processing message: [orderId={}, status={}], error: {}", message.orderId(), message.status(), e.getMessage(), e);
     }
 }
